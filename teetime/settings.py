@@ -77,7 +77,7 @@ WSGI_APPLICATION = 'teetime.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'tee_time',
+        'NAME': 'teetime',
         'USER': 'petercho',
         'PASSWORD': '',
         'HOST': 'localhost',

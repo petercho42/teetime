@@ -22,12 +22,22 @@ class Course(models.Model):
     booking_vendor = models.CharField(
         max_length=20,
         choices=BookingVendor.choices,
+        default=BookingVendor.FOREUP,
     )
-    
+
+class CourseSchedule(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    course = models.ForeignKey(Course, on_delete=models.PROTECT)
+    name = models.CharField(max_length=200)
+    schedule_id = models.IntegerField()
+    booking_class_id = models.IntegerField(null=True, blank=True)
+
 
 class UserTeeTimeRequest(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
     course = models.ForeignKey(Course, on_delete=models.PROTECT)
     date = models.DateField()
     tee_time_min = models.TimeField(default=None, null=True, blank=True)
@@ -39,14 +49,27 @@ class UserTeeTimeRequest(models.Model):
         THREE = 3
         FOUR = 4
     players = models.IntegerField(choices=Players.choices, default=Players.ANY)
-    class Holes(models.IntegerChoices):
-        NINE = 9
-        EIGHTEEN = 18
-    holes = models.IntegerField(choices=Holes.choices, default=Holes.EIGHTEEN)
+    class Holes(models.TextChoices):
+        ANY = "any", _("Any")
+        NINE = "9", _("9")
+        EIGHTEEN = "18", _("18")
+    holes = models.CharField(
+        max_length=20,
+        choices=Holes.choices,
+        default=Holes.ANY,
+    )
+    class Status(models.TextChoices):
+        ACTIVE = "active", _("Active")
+        INACTIVE = "inactive", _("Inactive")
+    status = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.INACTIVE,
+    )
 
 
 
-class ForeUpUser():
+class ForeUpUser(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     user = models.ForeignKey(User, on_delete=models.PROTECT)
@@ -55,13 +78,3 @@ class ForeUpUser():
     course_id = models.IntegerField()  # e.g. 19765 for Bethpage
     booking_class = models.IntegerField()
 
-    
-
-class ForeUpCourseInformation(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    course = models.ForeignKey(Course, on_delete=models.PROTECT)
-    schedule_id = models.IntegerField()
-
-
- 
