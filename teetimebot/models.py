@@ -8,7 +8,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 class User(AbstractUser):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    phone_numer = PhoneNumberField()
+    phone_number = PhoneNumberField()
 
 # Create your models here.
 
@@ -31,7 +31,7 @@ class CourseSchedule(models.Model):
     course = models.ForeignKey(Course, on_delete=models.PROTECT)
     name = models.CharField(max_length=200)
     schedule_id = models.IntegerField()
-    booking_class_id = models.IntegerField(null=True, blank=True)
+    booking_class = models.IntegerField(null=True, blank=True)
 
 
 class UserTeeTimeRequest(models.Model):
