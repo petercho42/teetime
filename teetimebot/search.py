@@ -26,7 +26,6 @@ class Search:
         print(f'tee_time_min: {user_request.tee_time_min}')
         print(f'tee_time_max: {user_request.tee_time_max}')
         print(user_request.course.name)
-        print(user_request.course.courseschedule_set.all())
 
         today_date = date.today()
         print(today_date)
@@ -69,8 +68,16 @@ class Search:
                     # Process the API response
                     api_data = response.json()
                     # ... Your processing logic here ...
-                    print("fuck")
-                    print(api_data)
+
+                    for tee_time in api_data:
+                        time_obj = datetime.strptime(tee_time['time'], '%Y-%m-%d %H:%M').time()
+                        if request_obj.tee_time_min and time_obj <= request_obj.tee_time_min:
+                            break
+                        if request_obj.tee_time_max and time_obj >= request_obj.tee_time_max:
+                            break
+
+                        print(f'Found: {tee_time["schedule_name"]} @{time_obj.strftime("%I:%M %p")} for {tee_time["available_spots"]}')
+
                 else:
                     print(f'Failed to fetch data from the API: {response.status_code} : {response.text}')
             except requests.exceptions.RequestException as e:
