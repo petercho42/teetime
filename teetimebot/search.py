@@ -3,6 +3,7 @@ from datetime import date, datetime
 
 import os
 import requests
+import time
 
 class Search:
 
@@ -30,13 +31,56 @@ class Search:
         today_date = date.today()
         print(today_date)
         if user_request.date >= today_date:
+            session = requests.session()
+            Search.get_fourupsoftware_session(session, user_request)
+
             while(True):
-                Search.call_fourupsoftware(user_request)
+                # Create a session to handle cookies
+                Search.check_for_tee_times(session, user_request)
                 break
 
+    @staticmethod
+    def check_for_tee_times(session, request_obj):
+        for schedule in request_obj.course.courseschedule_set.all():
+            data = {
+                'time':'all',
+                'date':request_obj.date.strftime('%m-%d-%Y'),
+                'holes':'all',
+                'players':request_obj.players,
+                'booking_class':schedule.booking_class,
+                'schedule_id':schedule.schedule_id,
+                'schedule_ids[]':2517,
+                'schedule_ids[]':2431,
+                'schedule_ids[]':2433,
+                'schedule_ids[]':2539,
+                'schedule_ids[]':2538,
+                'schedule_ids[]':2434,
+                'schedule_ids[]':2432,
+                'schedule_ids[]':2435,
+                'specials_only':0,
+                'api_key':'no_limits'
+            }
+            try:
+                # Make the GET request with data as query parameters
+                response = session.get(Search.FOREUP_TIMES_API, params=data)
+
+                # Check if the request was successful (status code 200)
+                if response.status_code == 200:
+                    # Process the API response
+                    api_data = response.json()
+                    # ... Your processing logic here ...
+                    print("fuck")
+                    print(api_data)
+                else:
+                    print(f'Failed to fetch data from the API: {response.status_code} : {response.text}')
+            except requests.exceptions.RequestException as e:
+                # Handle exceptions such as network errors
+                print('Error while making API request:', e)
+            time.sleep(2)
 
     @staticmethod
-    def call_fourupsoftware(request_obj):
+    def get_fourupsoftware_session(session, request_obj):
+
         foreup_user = request_obj.user.foreupuser_set.all()[0]
         login_data = {
             'username': foreup_user.username,
@@ -45,9 +89,6 @@ class Search:
             'api_key': 'no_limits',
             'course_id': foreup_user.course_id,
         }
-
-        # Create a session to handle cookies
-        session = requests.session()
 
         # Send the login POST request
         response = session.post(Search.FOREUP_LOGIN_API, data=login_data)
@@ -58,21 +99,3 @@ class Search:
             print('Login Success')
         else:
             print(f'Login failed. {response.status_code}: {response.text}')
-        '''
-        user = models.ForeignKey(User, on_delete=models.PROTECT)
-        course = models.ForeignKey(Course, on_delete=models.PROTECT)
-        date = models.DateField()
-        tee_time_min = models.TimeField(default=None, null=True, blank=True)
-        tee_time_max = models.TimeField(default=None, null=True, blank=True)
-        players = models.IntegerField(choices=Players.choices, default=Players.ANY)
-        holes = models.CharField(
-            max_length=20,
-            choices=Holes.choices,
-            default=Holes.ANY,
-        )
-        status = models.CharField(
-            max_length=20,
-            choices=Status.choices,
-            default=Status.INACTIVE,
-        )
-        '''
