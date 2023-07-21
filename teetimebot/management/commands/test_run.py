@@ -20,5 +20,5 @@ class Command(BaseCommand):
         '''
         result = Search.run()
         self.stdout.write(
-            self.style.SUCCESS(f'Searched {result}')
+            self.style.SUCCESS(f'Searched Done')
         )

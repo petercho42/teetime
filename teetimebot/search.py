@@ -13,34 +13,34 @@ class Search:
 
     @staticmethod
     def run():
-        user_request = UserTeeTimeRequest.objects.select_related(
+        user_requests = UserTeeTimeRequest.objects.select_related(
                 'course'
             ).prefetch_related(
                 'course__courseschedule_set', 'user__foreupuser_set'
             ).filter(
                 date__gte= date.today(),
                 status=UserTeeTimeRequest.Status.ACTIVE,
-            )[0]
+            )
         
-        print(user_request.date)
-        print(f'tee_time_min: {user_request.tee_time_min}')
-        print(f'tee_time_max: {user_request.tee_time_max}')
-        print(user_request.course.name)
+        for user_request in user_requests:
+            print(f'{user_request.course.name} Search')
+            print(f'date: {user_request.date}')
+            print(f'tee_time_min: {user_request.tee_time_min}')
+            print(f'tee_time_max: {user_request.tee_time_max}')
 
-        today_date = date.today()
-        print(today_date)
-        if user_request.date >= today_date:
-            session = requests.session()
-            Search.get_fourupsoftware_session(session, user_request)
+            if user_request.date >= date.today():
+                session = requests.session()
+                Search.get_fourupsoftware_session(session, user_request)
 
-            while(True):
-                # Create a session to handle cookies
-                Search.check_for_tee_times(session, user_request)
-                break
+                while(True):
+                    # Create a session to handle cookies
+                    Search.check_for_tee_times(session, user_request)
+                    break
 
     @staticmethod
     def check_for_tee_times(session, request_obj):
         for schedule in request_obj.course.courseschedule_set.all():
+            print(f'Searching for {schedule.name} teetime')
             data = {
                 'time':'all',
                 'date':request_obj.date.strftime('%m-%d-%Y'),

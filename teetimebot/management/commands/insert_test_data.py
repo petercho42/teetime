@@ -146,3 +146,17 @@ class Command(BaseCommand):
         self.stdout.write(
             self.style.SUCCESS(f'Created UserTeeTimeRequest {user_request.id}')
         )
+
+        user_request = UserTeeTimeRequest.objects.create(
+            user=u,
+            course=bethpage,
+            date=date(2023, 7, 23),
+            tee_time_min = None,
+            tee_time_max = time(8, 00),
+            players = UserTeeTimeRequest.Players.ANY,
+            holes=UserTeeTimeRequest.Holes.ANY,
+            status=UserTeeTimeRequest.Status.ACTIVE
+        )
+        self.stdout.write(
+            self.style.SUCCESS(f'Created UserTeeTimeRequest {user_request.id}')
+        )
