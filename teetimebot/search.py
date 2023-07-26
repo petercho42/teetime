@@ -21,7 +21,7 @@ class Search:
                 'course__courseschedule_set', 'user__foreupuser_set'
             ).filter(
                 status=UserTeeTimeRequest.Status.ACTIVE,
-            )
+            ).order_by('date')
         
         for user_request in user_requests:
             user_request.update_status_if_expired()
