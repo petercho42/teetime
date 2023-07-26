@@ -32,12 +32,12 @@ class Search:
                 print(f'tee_time_max: {user_request.tee_time_max}')
 
                 session = requests.session()
-                Search.get_fourupsoftware_session(session, user_request)
-                Search.check_for_tee_times(session, user_request)
+                Search.__get_foreupsoftware_session(session, user_request)
+                Search.__check_for_tee_times(session, user_request)
                     
 
     @staticmethod
-    def check_for_tee_times(session, request_obj):
+    def __check_for_tee_times(session, request_obj):
         for schedule in request_obj.course.courseschedule_set.all():
             print(f'Searching for {schedule.name} teetime')
             data = {
@@ -47,14 +47,14 @@ class Search:
                 'players':request_obj.players,
                 'booking_class':schedule.booking_class,
                 'schedule_id':schedule.schedule_id,
-                'schedule_ids[]':2517,
-                'schedule_ids[]':2431,
-                'schedule_ids[]':2433,
-                'schedule_ids[]':2539,
-                'schedule_ids[]':2538,
-                'schedule_ids[]':2434,
-                'schedule_ids[]':2432,
-                'schedule_ids[]':2435,
+                'schedule_ids[]':2517, # vanity key value kept to look more inconspicuous 
+                'schedule_ids[]':2431, # vanity key value
+                'schedule_ids[]':2433, # vanity key value
+                'schedule_ids[]':2539, # vanity key value
+                'schedule_ids[]':2538, # vanity key value
+                'schedule_ids[]':2434, # vanity key value
+                'schedule_ids[]':2432, # vanity key value
+                'schedule_ids[]':2435, # vanity key value
                 'specials_only':0,
                 'api_key':'no_limits'
             }
@@ -82,10 +82,10 @@ class Search:
             except requests.exceptions.RequestException as e:
                 # Handle exceptions such as network errors
                 print('Error while making API request:', e)
-            time.sleep(2)
+            time.sleep(1.5)
 
     @staticmethod
-    def get_fourupsoftware_session(session, request_obj):
+    def __get_foreupsoftware_session(session, request_obj):
         redis_client = redis.StrictRedis(host='localhost', port=6379, db=0)
         session_key = f'user:{request_obj.user.id}:course:{request_obj.course.id}:login_session'
         print(session_key)
