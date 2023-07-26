@@ -136,7 +136,7 @@ class Command(BaseCommand):
         user_request = UserTeeTimeRequest.objects.create(
             user=u,
             course=bethpage,
-            date=date(2023, 7, 22),
+            date=date(2023, 7, 29),
             tee_time_min = None,
             tee_time_max = time(8, 00),
             players = UserTeeTimeRequest.Players.ANY,
@@ -150,7 +150,7 @@ class Command(BaseCommand):
         user_request = UserTeeTimeRequest.objects.create(
             user=u,
             course=bethpage,
-            date=date(2023, 7, 23),
+            date=date(2023, 7, 30),
             tee_time_min = None,
             tee_time_max = time(8, 00),
             players = UserTeeTimeRequest.Players.ANY,

@@ -1,4 +1,5 @@
 asgiref==3.7.2
+async-timeout==4.0.2
 certifi==2023.5.7
 charset-normalizer==3.2.0
 Django==4.2.1
@@ -7,6 +8,7 @@ django-phonenumbers==1.0.1
 idna==3.4
 phonenumbers==8.13.13
 psycopg2==2.9.6
+redis==4.6.0
 requests==2.31.0
 sqlparse==0.4.4
 typing_extensions==4.6.3

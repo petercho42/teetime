@@ -5,6 +5,8 @@ from django.contrib.auth.models import AbstractUser
 
 from phonenumber_field.modelfields import PhoneNumberField
 
+from datetime import date, datetime, timedelta
+
 class User(AbstractUser):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -61,11 +63,25 @@ class UserTeeTimeRequest(models.Model):
     class Status(models.TextChoices):
         ACTIVE = "active", _("Active")
         INACTIVE = "inactive", _("Inactive")
+        EXPIRED = "expired", _("Expired")
     status = models.CharField(
         max_length=20,
         choices=Status.choices,
         default=Status.INACTIVE,
     )
+    def update_status_if_expired(self):
+        if date.today() > self.date:
+            self.status = UserTeeTimeRequest.Status.EXPIRED
+            self.save(update_fields=['status'])
+            print(f'Request ID {self.id} expired')
+        elif date.today() == self.date:
+            # stop searching 3hrs and 10 minutes before the teetime
+            if self.course.id.booking_vendor == Course.BookingVendor.FOREUP:
+                if self.tee_time_max is not None:
+                    expiration_time = (self.tee_time_max - timedelta(hours=3, minutes=10)).time()
+                    if datetime.now().time() >= expiration_time:
+                        self.status = UserTeeTimeRequest.Status.EXPIRED
+                        self.save(update_fields=['status'])
 
 
 

@@ -1,7 +1,9 @@
 from teetimebot.models import User, Course, CourseSchedule, UserTeeTimeRequest, ForeUpUser
-from datetime import date, datetime
+from datetime import datetime
 
 import os
+import pickle
+import redis
 import requests
 import time
 
@@ -18,24 +20,21 @@ class Search:
             ).prefetch_related(
                 'course__courseschedule_set', 'user__foreupuser_set'
             ).filter(
-                date__gte= date.today(),
                 status=UserTeeTimeRequest.Status.ACTIVE,
             )
         
         for user_request in user_requests:
-            print(f'{user_request.course.name} Search')
-            print(f'date: {user_request.date}')
-            print(f'tee_time_min: {user_request.tee_time_min}')
-            print(f'tee_time_max: {user_request.tee_time_max}')
+            user_request.update_status_if_expired()
+            if user_request.status == UserTeeTimeRequest.Status.ACTIVE:
+                print(f'{user_request.course.name} Search')
+                print(f'date: {user_request.date}')
+                print(f'tee_time_min: {user_request.tee_time_min}')
+                print(f'tee_time_max: {user_request.tee_time_max}')
 
-            if user_request.date >= date.today():
                 session = requests.session()
                 Search.get_fourupsoftware_session(session, user_request)
-
-                while(True):
-                    # Create a session to handle cookies
-                    Search.check_for_tee_times(session, user_request)
-                    break
+                Search.check_for_tee_times(session, user_request)
+                    
 
     @staticmethod
     def check_for_tee_times(session, request_obj):
@@ -87,22 +86,33 @@ class Search:
 
     @staticmethod
     def get_fourupsoftware_session(session, request_obj):
-
-        foreup_user = request_obj.user.foreupuser_set.all()[0]
-        login_data = {
-            'username': foreup_user.username,
-            'password': foreup_user.password if foreup_user.password else Search.MY_FOREUP_PASSWORD,
-            'booking_class_id': foreup_user.booking_class,
-            'api_key': 'no_limits',
-            'course_id': foreup_user.course_id,
-        }
-
-        # Send the login POST request
-        response = session.post(Search.FOREUP_LOGIN_API, data=login_data)
-
-        # Check if login was successful (based on status code or response content)
-        if response.status_code == 200:
-            # You are now logged in and can access the authenticated pages
-            print('Login Success')
+        redis_client = redis.StrictRedis(host='localhost', port=6379, decode_responses=True)
+        session_key = f'user:{request_obj.user.id}:course:{request_obj.course.id}:login_session'
+        print(session_key)
+        serialized_session = redis_client.get(session_key)
+        if serialized_session is not None:
+            print("shit")
+            session = pickle.loads(serialized_session)
+            print("shitty")
+            print(f'Session key {session_key} taken from redis')
         else:
-            print(f'Login failed. {response.status_code}: {response.text}')
+            foreup_user = request_obj.user.foreupuser_set.all()[0]
+            login_data = {
+                'username': foreup_user.username,
+                'password': foreup_user.password if foreup_user.password else Search.MY_FOREUP_PASSWORD,
+                'booking_class_id': foreup_user.booking_class,
+                'api_key': 'no_limits',
+                'course_id': foreup_user.course_id,
+            }
+
+            # Send the login POST request
+            response = session.post(Search.FOREUP_LOGIN_API, data=login_data)
+
+            # Check if login was successful (based on status code or response content)
+            if response.status_code == 200:
+                # You are now logged in and can access the authenticated pages
+                print('Login Success. Saving the serialized session to redis')
+                serialized_session = pickle.dumps(session)
+                redis_client.set(session_key, serialized_session)
+            else:
+                print(f'Login failed. {response.status_code}: {response.text}')
