@@ -86,15 +86,17 @@ class Search:
 
     @staticmethod
     def get_fourupsoftware_session(session, request_obj):
-        redis_client = redis.StrictRedis(host='localhost', port=6379, decode_responses=True)
+        redis_client = redis.StrictRedis(host='localhost', port=6379, db=0)
         session_key = f'user:{request_obj.user.id}:course:{request_obj.course.id}:login_session'
         print(session_key)
         serialized_session = redis_client.get(session_key)
         if serialized_session is not None:
-            print("shit")
-            session = pickle.loads(serialized_session)
-            print("shitty")
+            session_data = pickle.loads(serialized_session)
             print(f'Session key {session_key} taken from redis')
+            # Set session data in the new session object
+            for cookie_name, cookie_value in session_data['cookies'].items():
+                print(f'{cookie_name}: {cookie_value}')
+                session.cookies.update({cookie_name: cookie_value})
         else:
             foreup_user = request_obj.user.foreupuser_set.all()[0]
             login_data = {
@@ -112,7 +114,12 @@ class Search:
             if response.status_code == 200:
                 # You are now logged in and can access the authenticated pages
                 print('Login Success. Saving the serialized session to redis')
-                serialized_session = pickle.dumps(session)
+                print(session.cookies)
+                session_data = {
+                    'cookies': session.cookies.get_dict(),
+                    # Add any other necessary session data here
+                }
+                serialized_session = pickle.dumps(session_data)
                 redis_client.set(session_key, serialized_session)
             else:
                 print(f'Login failed. {response.status_code}: {response.text}')
