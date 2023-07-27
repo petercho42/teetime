@@ -1,6 +1,8 @@
 from teetimebot.models import User, Course, CourseSchedule, UserTeeTimeRequest, ForeUpUser
 from datetime import datetime
 
+from teetimebot.twilio_client import TwilioClient
+
 import os
 import pickle
 import redis
@@ -79,7 +81,8 @@ class Search:
                             break
 
                         pending_reservation_success = False
-                        print(f'Found: {tee_time["schedule_name"]} @{time_obj.strftime("%I:%M %p")} for {tee_time["available_spots"]}')
+                        text_message_body = f'Found: {tee_time["schedule_name"]} @{time_obj.strftime("%I:%M %p")} for {tee_time["available_spots"]}'
+                        print(text_message_body)
                         pending_reservation_data= {
                             'time': tee_time["time"],
                             'holes': tee_time["holes"],
@@ -99,6 +102,7 @@ class Search:
                         if response.status_code == 200:
                             reservation_id = response.json()['reservation_id']
                             print(f'Created pending reservation {reservation_id}')
+                            TwilioClient.send_message(str(request_obj.user.phone_number), text_message_body)
                             pending_reservation_success = True
                             refresh_left = 2
                             while refresh_left > 0:
