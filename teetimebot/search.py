@@ -11,6 +11,9 @@ class Search:
 
     FOREUP_LOGIN_API = 'https://foreupsoftware.com/index.php/api/booking/users/login' # GET
     FOREUP_TIMES_API = 'https://foreupsoftware.com/index.php/api/booking/times' # POST
+    FOREUP_PENDING_RESERVATION_API = 'https://foreupsoftware.com/index.php/api/booking/pending_reservation' # POST
+    FOREUP_REFRESH_PEDNING_RESERVATION_API = 'https://foreupsoftware.com/index.php/api/booking/refresh_pending_reservation'
+
     MY_FOREUP_PASSWORD = os.getenv('MY_FOREUP_PASSWORD')
 
     @staticmethod
@@ -75,7 +78,53 @@ class Search:
                         if request_obj.tee_time_max and time_obj >= request_obj.tee_time_max:
                             break
 
+                        pending_reservation_success = False
                         print(f'Found: {tee_time["schedule_name"]} @{time_obj.strftime("%I:%M %p")} for {tee_time["available_spots"]}')
+                        pending_reservation_data= {
+                            'time': tee_time["time"],
+                            'holes': tee_time["holes"],
+                            'players': tee_time["available_spots"],
+                            'carts': 'false',
+                            'schedule_id': tee_time["schedule_id"],
+                            'teesheet_side_id': tee_time["teesheet_side_id"],
+                            'course_id': tee_time["course_id"],
+                            'booking_class_id': tee_time["booking_class_id"],
+                            'duration': 1,
+                        }
+                        print(pending_reservation_data)
+                        headers = {
+                            "Api-Key": "no_limits"
+                        }
+                        response = session.post(Search.FOREUP_PENDING_RESERVATION_API, data=pending_reservation_data, headers=headers)
+                        if response.status_code == 200:
+                            reservation_id = response.json()['reservation_id']
+                            print(f'Created pending reservation {reservation_id}')
+                            pending_reservation_success = True
+                            refresh_left = 2
+                            while refresh_left > 0:
+                                time.sleep(15)
+                                response = session.post(f'{Search.FOREUP_REFRESH_PEDNING_RESERVATION_API}/{reservation_id}', headers=headers)
+                                if response.status_code == 200:
+                                    print(F'Pending Reservation Refresh Success')
+                                else:
+                                    print(f'Failed to refresh pending reservation: {response.status_code} : {response.text}')
+                                refresh_left = refresh_left - 1
+                            response = session.delete(f'{Search.FOREUP_PENDING_RESERVATION_API}/{reservation_id}', headers=headers)
+                            if response.status_code == 200:
+                                print(F'Pending Reservation Delete Success')
+                            else:
+                                print(f'Failed to delete pending reservation: {response.status_code} : {response.text}')
+                                break
+                        
+                        else:
+                            print(f'Failed to create pending reservation: {response.status_code} : {response.text}')
+                            break
+                        if pending_reservation_success:
+                            request_obj.status = UserTeeTimeRequest.Status.PENDING
+                            request_obj.save(update_fields=['status'])
+                            print(f'Updated the request to pending.')
+                            break
+
 
                 else:
                     print(f'Failed to fetch data from the API: {response.status_code} : {response.text}')

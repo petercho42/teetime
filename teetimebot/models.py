@@ -64,6 +64,7 @@ class UserTeeTimeRequest(models.Model):
         ACTIVE = "active", _("Active")
         INACTIVE = "inactive", _("Inactive")
         EXPIRED = "expired", _("Expired")
+        PENDING = "pending", _("Pending")
     status = models.CharField(
         max_length=20,
         choices=Status.choices,
