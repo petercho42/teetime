@@ -141,7 +141,7 @@ class Command(BaseCommand):
             tee_time_max = time(8, 00),
             players = UserTeeTimeRequest.Players.ANY,
             holes=UserTeeTimeRequest.Holes.ANY,
-            status=UserTeeTimeRequest.Status.ACTIVE
+            status=UserTeeTimeRequest.Status.INACTIVE
         )
         self.stdout.write(
             self.style.SUCCESS(f'Created UserTeeTimeRequest {user_request.id}')
