@@ -5,6 +5,7 @@ from teetimebot.twilio_client import TwilioClient
 
 import os
 import pickle
+import random
 import redis
 import requests
 import time
@@ -28,17 +29,19 @@ class Search:
                 status=UserTeeTimeRequest.Status.ACTIVE,
             ).order_by('date')
         
-        for user_request in user_requests:
-            user_request.update_status_if_expired()
-            if user_request.status == UserTeeTimeRequest.Status.ACTIVE:
-                print(f'{user_request.course.name} Search')
-                print(f'date: {user_request.date}')
-                print(f'tee_time_min: {user_request.tee_time_min}')
-                print(f'tee_time_max: {user_request.tee_time_max}')
+        while True:
+            print(datetime.now())
+            for user_request in user_requests:
+                user_request.update_status_if_expired()
+                if user_request.status == UserTeeTimeRequest.Status.ACTIVE:
+                    print(f'{user_request.course.name} Search')
+                    print(f'date: {user_request.date}')
+                    print(f'tee_time_min: {user_request.tee_time_min}')
+                    print(f'tee_time_max: {user_request.tee_time_max}')
 
-                session = requests.session()
-                Search.__get_foreupsoftware_session(session, user_request)
-                Search.__check_for_tee_times(session, user_request)
+                    session = requests.session()
+                    Search.__get_foreupsoftware_session(session, user_request)
+                    Search.__check_for_tee_times(session, user_request)
                     
 
     @staticmethod
@@ -80,8 +83,10 @@ class Search:
                         if request_obj.tee_time_max and time_obj >= request_obj.tee_time_max:
                             break
 
-                        pending_reservation_success = False
-                        text_message_body = f'Found: {tee_time["schedule_name"]} @{time_obj.strftime("%I:%M %p")} for {tee_time["available_spots"]}'
+                        teetime_date = datetime.strptime(tee_time['time'], '%Y-%m-%d %H:%M').date().strftime("%A %m/%d/%y")
+                        book_here_str = f'https://foreupsoftware.com/index.php/booking/{tee_time["course_id"]}/{tee_time["schedule_id"]}#/teetimes'
+                        # text_message_body = f'{teetime_date}: {tee_time["schedule_name"]} @{time_obj.strftime("%I:%M %p")} for {tee_time["available_spots"]}. {book_here_str}'
+                        text_message_body = f'{teetime_date}: {tee_time["schedule_name"]} @{time_obj.strftime("%I:%M %p")} for {tee_time["available_spots"]}.'
                         print(text_message_body)
                         pending_reservation_data= {
                             'time': tee_time["time"],
@@ -103,8 +108,7 @@ class Search:
                             reservation_id = response.json()['reservation_id']
                             print(f'Created pending reservation {reservation_id}')
                             TwilioClient.send_message(str(request_obj.user.phone_number), text_message_body)
-                            pending_reservation_success = True
-                            refresh_left = 2
+                            refresh_left = 12
                             while refresh_left > 0:
                                 time.sleep(15)
                                 response = session.post(f'{Search.FOREUP_REFRESH_PEDNING_RESERVATION_API}/{reservation_id}', headers=headers)
@@ -123,11 +127,6 @@ class Search:
                         else:
                             print(f'Failed to create pending reservation: {response.status_code} : {response.text}')
                             break
-                        if pending_reservation_success:
-                            request_obj.status = UserTeeTimeRequest.Status.PENDING
-                            request_obj.save(update_fields=['status'])
-                            print(f'Updated the request to pending.')
-                            break
 
 
                 else:
@@ -135,7 +134,9 @@ class Search:
             except requests.exceptions.RequestException as e:
                 # Handle exceptions such as network errors
                 print('Error while making API request:', e)
-            time.sleep(1.5)
+            # randomly sleep for 1-10 seconds to avoid getting rate limited
+            random_float = round(random.uniform(1, 5), 1)
+            time.sleep(random_float)
 
     @staticmethod
     def __get_foreupsoftware_session(session, request_obj):
