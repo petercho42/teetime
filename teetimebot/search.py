@@ -30,14 +30,11 @@ class Search:
             ).order_by('date')
         
         while True:
-            print(datetime.now())
             for user_request in user_requests:
                 user_request.update_status_if_expired()
                 if user_request.status == UserTeeTimeRequest.Status.ACTIVE:
-                    print(f'{user_request.course.name} Search')
-                    print(f'date: {user_request.date}')
-                    print(f'tee_time_min: {user_request.tee_time_min}')
-                    print(f'tee_time_max: {user_request.tee_time_max}')
+                    print(f'[{datetime.now().strftime("%Y-%m-%d %I:%M:%S %p")}]')
+                    print(f'Searching {user_request.course.name} {user_request.date} times. (Min: {user_request.tee_time_min}, Max: {user_request.tee_time_max})')
 
                     session = requests.session()
                     Search.__get_foreupsoftware_session(session, user_request)
@@ -138,14 +135,12 @@ class Search:
     def __get_foreupsoftware_session(session, request_obj):
         redis_client = redis.StrictRedis(host='localhost', port=6379, db=0)
         session_key = f'user:{request_obj.user.id}:course:{request_obj.course.id}:login_session'
-        print(session_key)
         serialized_session = redis_client.get(session_key)
         if serialized_session is not None:
             session_data = pickle.loads(serialized_session)
-            print(f'Session key {session_key} taken from redis')
+            # print(f'Session key {session_key} taken from redis')
             # Set session data in the new session object
             for cookie_name, cookie_value in session_data['cookies'].items():
-                print(f'{cookie_name}: {cookie_value}')
                 session.cookies.update({cookie_name: cookie_value})
         else:
             foreup_user = request_obj.user.foreupuser_set.all()[0]
@@ -164,7 +159,6 @@ class Search:
             if response.status_code == 200:
                 # You are now logged in and can access the authenticated pages
                 print('Login Success. Saving the serialized session to redis')
-                print(session.cookies)
                 session_data = {
                     'cookies': session.cookies.get_dict(),
                     # Add any other necessary session data here
