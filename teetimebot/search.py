@@ -85,6 +85,9 @@ class Search:
                         # text_message_body = f'{teetime_date}: {tee_time["schedule_name"]} @{time_obj.strftime("%I:%M %p")} for {tee_time["available_spots"]}. {book_here_str}'
                         text_message_body = f'{teetime_date}: {tee_time["schedule_name"]} @{time_obj.strftime("%I:%M %p")} for {tee_time["available_spots"]}.'
                         print(text_message_body)
+                        TwilioClient.send_message(str(request_obj.user.phone_number), text_message_body)
+
+                        """
                         pending_reservation_data= {
                             'time': tee_time["time"],
                             'holes': tee_time["holes"],
@@ -122,6 +125,7 @@ class Search:
                         
                         else:
                             print(f'Failed to create pending reservation: {response.status_code} : {response.text}')
+                        """
                 else:
                     print(f'Failed to fetch data from the API: {response.status_code} : {response.text}')
             except requests.exceptions.RequestException as e:
