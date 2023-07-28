@@ -125,8 +125,6 @@ class Search:
                         
                         else:
                             print(f'Failed to create pending reservation: {response.status_code} : {response.text}')
-
-
                 else:
                     print(f'Failed to fetch data from the API: {response.status_code} : {response.text}')
             except requests.exceptions.RequestException as e:
