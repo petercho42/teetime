@@ -122,11 +122,9 @@ class Search:
                                 print(F'Pending Reservation Delete Success')
                             else:
                                 print(f'Failed to delete pending reservation: {response.status_code} : {response.text}')
-                                break
                         
                         else:
                             print(f'Failed to create pending reservation: {response.status_code} : {response.text}')
-                            break
 
 
                 else:
