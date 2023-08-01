@@ -44,10 +44,11 @@ class Command(BaseCommand):
         u = User.objects.create(
             first_name = "Peter",
             last_name = "Cho",
+            email = "petercho42@yahoo.com",
             phone_number = PhoneNumber.from_string("+19172820312")
         )
         self.stdout.write(
-            self.style.SUCCESS(f'Created User {u.phone_number}')
+            self.style.SUCCESS(f'Created User {u.first_name} {u.last_name}, {u.phone_number}')
         )
 
         '''
@@ -150,9 +151,9 @@ class Command(BaseCommand):
         user_request = UserTeeTimeRequest.objects.create(
             user=u,
             course=bethpage,
-            date=date(2023, 7, 30),
+            date=date(2023, 8, 6),
             tee_time_min = None,
-            tee_time_max = time(8, 00),
+            tee_time_max = time(22, 00),
             players = UserTeeTimeRequest.Players.ANY,
             holes=UserTeeTimeRequest.Holes.ANY,
             status=UserTeeTimeRequest.Status.ACTIVE

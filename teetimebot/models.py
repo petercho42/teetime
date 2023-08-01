@@ -1,16 +1,31 @@
-from django.db import models
-from django.utils.translation import gettext_lazy as _
+from datetime import date, datetime, timedelta
 
 from django.contrib.auth.models import AbstractUser
+from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.utils.translation import gettext_lazy as _
 
 from phonenumber_field.modelfields import PhoneNumberField
-
-from datetime import date, datetime, timedelta
 
 class User(AbstractUser):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     phone_number = PhoneNumberField()
+
+class UserNotifications(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    text = models.BooleanField(default=False)
+    email = models.BooleanField(default=True)
+    push = models.BooleanField(default=False)
+
+
+@receiver(post_save, sender=User)
+def create_usernotifications(sender, instance, created, **kwargs):
+    if created:
+        UserNotifications.objects.get_or_create(user=instance)
+
+post_save.connect(create_usernotifications, sender=User)   
 
 # Create your models here.
 
@@ -95,3 +110,4 @@ class ForeUpUser(models.Model):
     course_id = models.IntegerField()  # e.g. 19765 for Bethpage
     booking_class = models.IntegerField()
 
+ 

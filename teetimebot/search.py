@@ -1,7 +1,8 @@
 from teetimebot.models import User, Course, CourseSchedule, UserTeeTimeRequest, ForeUpUser
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from teetimebot.twilio_client import TwilioClient
+from teetimebot.email_client import EmailClient
 
 import os
 import pickle
@@ -81,12 +82,9 @@ class Search:
                             break
 
                         teetime_date = datetime.strptime(tee_time['time'], '%Y-%m-%d %H:%M').date().strftime("%A %m/%d/%y")
-                        book_here_str = f'https://foreupsoftware.com/index.php/booking/{tee_time["course_id"]}/{tee_time["schedule_id"]}#/teetimes'
-                        # text_message_body = f'{teetime_date}: {tee_time["schedule_name"]} @{time_obj.strftime("%I:%M %p")} for {tee_time["available_spots"]}. {book_here_str}'
-                        text_message_body = f'{teetime_date}: {tee_time["schedule_name"]} @{time_obj.strftime("%I:%M %p")} for {tee_time["available_spots"]}.'
-                        print(text_message_body)
+                        message_subject = f'{teetime_date}: {tee_time["schedule_name"]} @{time_obj.strftime("%I:%M %p")} for {tee_time["available_spots"]}.'
+                        print(message_subject)
                         
-                        # TwilioClient.send_message(str(request_obj.user.phone_number), text_message_body)
                         pending_reservation_data= {
                             'time': tee_time["time"],
                             'holes': tee_time["holes"],
@@ -106,10 +104,23 @@ class Search:
                         if response.status_code == 200:
                             reservation_id = response.json()['reservation_id']
                             print(f'Created pending reservation {reservation_id}')
-                            TwilioClient.send_message(str(request_obj.user.phone_number), text_message_body)
-                            refresh_left = 4
+                            refresh_left = 5
+                            pending_reservation_sleep = 15
+                            if request_obj.user.usernotifications.text:
+                                TwilioClient.send_message(str(request_obj.user.phone_number), message_subject)
+                            if request_obj.user.usernotifications.email:
+                                pending_reservation_created_at = datetime.now()
+                                release_time = (pending_reservation_created_at + timedelta(seconds=refresh_left*pending_reservation_sleep)).time()
+                                book_here_str = f'https://foreupsoftware.com/index.php/booking/{tee_time["course_id"]}/{tee_time["schedule_id"]}#/teetimes'
+                                message_body = f"""
+                                {message_subject}
+                                Pending Reservation created at {pending_reservation_created_at.strftime("%I:%M:%S %p")}
+                                Pending Reservation will be at aproximately {release_time.strftime("%I:%M:%S %p")}
+                                {book_here_str}
+                                """
+                                EmailClient.send_email_with_yahoo(request_obj.user.email, message_subject, message_body)
                             while refresh_left > 0:
-                                time.sleep(15)
+                                time.sleep(pending_reservation_sleep)
                                 response = session.post(f'{Search.FOREUP_REFRESH_PEDNING_RESERVATION_API}/{reservation_id}', headers=headers)
                                 if response.status_code == 200:
                                     print(F'Pending Reservation Refresh Success')
