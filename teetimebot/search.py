@@ -118,7 +118,7 @@ class Search:
                                 Pending Reservation will be at aproximately {release_time.strftime("%I:%M:%S %p")}
                                 {book_here_str}
                                 """
-                                EmailClient.send_email_with_yahoo(request_obj.user.email, message_subject, message_body)
+                                EmailClient.send_email_with_outlook(request_obj.user.email, message_subject, message_body)
                             while refresh_left > 0:
                                 time.sleep(pending_reservation_sleep)
                                 response = session.post(f'{Search.FOREUP_REFRESH_PEDNING_RESERVATION_API}/{reservation_id}', headers=headers)

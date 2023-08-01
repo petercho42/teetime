@@ -20,7 +20,7 @@ class Command(BaseCommand):
         '''
         Clean Data
         '''
-        EmailClient.send_email_with_yahoo("phcho83@gmail.com", "subject", "body")
+        EmailClient.send_email_with_outlook("petercho42@gmail.com", "subject", "body")
         self.stdout.write(
             self.style.SUCCESS(f'Test Done')
         )
