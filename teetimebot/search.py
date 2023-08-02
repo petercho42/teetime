@@ -89,7 +89,7 @@ class Search:
                                 break
 
                             teetime_date = datetime.strptime(tee_time['teeTime'], '%Y-%m-%dT%H:%M:%S').date().strftime("%A %m/%d/%y")
-                            message_subject = f'{teetime_date}: {schedule.course.name} @{time_obj.strftime("%I:%M %p")} for {tee_time["rounds"]}.'
+                            message_subject = f'{teetime_date}: {schedule.course.name} @{time_obj.strftime("%I:%M %p")} for {tee_time["rounds"]} {(tee_time["formattedPrice"])}.'
                             print(message_subject)
 
                             if request_obj.user.usernotifications.text:
