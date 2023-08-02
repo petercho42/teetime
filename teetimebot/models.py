@@ -65,6 +65,8 @@ class UserTeeTimeRequest(models.Model):
         max_length=20,
         choices=RecurringPeriod.choices,
         default=None,
+        null=True,
+        blank=True
     )
     tee_time_min = models.TimeField(default=None, null=True, blank=True)
     tee_time_max = models.TimeField(default=None, null=True, blank=True)

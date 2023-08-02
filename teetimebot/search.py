@@ -21,25 +21,27 @@ class Search:
     MY_FOREUP_PASSWORD = os.getenv('MY_FOREUP_PASSWORD')
 
     @staticmethod
-    def run():
+    def run(vendor):
         user_requests = UserTeeTimeRequest.objects.select_related(
                 'course'
             ).prefetch_related(
                 'course__courseschedule_set', 'user__foreupuser_set'
             ).filter(
                 status=UserTeeTimeRequest.Status.ACTIVE,
+                course__booking_vendor=vendor
             ).order_by('date')
         
-        while True:
-            for user_request in user_requests:
-                user_request.update_status_if_expired()
-                if user_request.status == UserTeeTimeRequest.Status.ACTIVE:
-                    print(f'[{datetime.now().strftime("%Y-%m-%d %I:%M:%S %p")}]')
-                    print(f'Searching {user_request.course.name} {user_request.date} times. (Min: {user_request.tee_time_min}, Max: {user_request.tee_time_max})')
+        if user_requests:
+            while True:
+                for user_request in user_requests:
+                    user_request.update_status_if_expired()
+                    if user_request.status == UserTeeTimeRequest.Status.ACTIVE:
+                        print(f'[{datetime.now().strftime("%Y-%m-%d %I:%M:%S %p")}]')
+                        print(f'Searching {user_request.course.name} {user_request.date} times. (Min: {user_request.tee_time_min}, Max: {user_request.tee_time_max})')
 
-                    session = requests.session()
-                    Search.__get_foreupsoftware_session(session, user_request)
-                    Search.__check_for_tee_times(session, user_request)
+                        session = requests.session()
+                        Search.__get_foreupsoftware_session(session, user_request)
+                        Search.__check_for_tee_times(session, user_request)
                     
 
     @staticmethod

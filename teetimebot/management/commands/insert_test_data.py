@@ -131,6 +131,48 @@ class Command(BaseCommand):
             self.style.SUCCESS(f'Created CourseSchedule {bethpage_yellow.name}')
         )
 
+
+        '''
+        Create Course
+        '''
+        douglaston = Course.objects.create(
+            name='Douglaston Golf Course',
+            booking_vendor=Course.BookingVendor.TEEOFF,
+        )
+        self.stdout.write(
+            self.style.SUCCESS(f'Created Course {douglaston.name}')
+        )
+
+        douglaston_eighteen = CourseSchedule.objects.create(
+            course=douglaston,
+            name="Douglaston Golf Course 18 Hole",
+            schedule_id=5044
+        )
+        self.stdout.write(
+            self.style.SUCCESS(f'Created CourseSchedule {douglaston_eighteen.name}')
+        )
+
+
+        '''
+        Create Course
+        '''
+        kissena = Course.objects.create(
+            name='Kissena Golf Course',
+            booking_vendor=Course.BookingVendor.TEEOFF,
+        )
+        self.stdout.write(
+            self.style.SUCCESS(f'Created Course {kissena.name}')
+        )
+
+        kissena_eighteen = CourseSchedule.objects.create(
+            course=kissena,
+            name="Kissena Golf Course 18 Hole",
+            schedule_id=5046
+        )
+        self.stdout.write(
+            self.style.SUCCESS(f'Created CourseSchedule {kissena_eighteen.name}')
+        )
+
         '''
         Create UserTeeTimeRequest
         '''
@@ -153,9 +195,33 @@ class Command(BaseCommand):
             course=bethpage,
             date=date(2023, 8, 6),
             tee_time_min = None,
-            tee_time_max = time(22, 00),
+            tee_time_max = time(8, 00),
             players = UserTeeTimeRequest.Players.ANY,
             holes=UserTeeTimeRequest.Holes.ANY,
+            status=UserTeeTimeRequest.Status.ACTIVE
+        )
+        self.stdout.write(
+            self.style.SUCCESS(f'Created UserTeeTimeRequest {user_request.id}')
+        )
+
+        user_request = UserTeeTimeRequest.objects.create(
+            user=u,
+            course=douglaston,
+            recurring = UserTeeTimeRequest.RecurringPeriod.WEEKDAYS,
+            search_time_min = time(5, 00),
+            search_time_max = time(13, 00),
+            status=UserTeeTimeRequest.Status.ACTIVE
+        )
+        self.stdout.write(
+            self.style.SUCCESS(f'Created UserTeeTimeRequest {user_request.id}')
+        )
+        
+        user_request = UserTeeTimeRequest.objects.create(
+            user=u,
+            course=kissena,
+            recurring = UserTeeTimeRequest.RecurringPeriod.WEEKDAYS,
+            search_time_min = time(5, 00),
+            search_time_max = time(13, 00),
             status=UserTeeTimeRequest.Status.ACTIVE
         )
         self.stdout.write(
