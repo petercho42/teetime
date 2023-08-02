@@ -1,9 +1,3 @@
-from teetimebot.models import User, Course, CourseSchedule, UserTeeTimeRequest, ForeUpUser
-from datetime import datetime, timedelta
-
-from teetimebot.twilio_client import TwilioClient
-from teetimebot.email_client import EmailClient
-
 import os
 import pickle
 import random
@@ -11,14 +5,21 @@ import redis
 import requests
 import time
 
+from datetime import date, datetime, timedelta
+
+from teetimebot.models import Course, UserTeeTimeRequest
+from teetimebot.twilio_client import TwilioClient
+from teetimebot.email_client import EmailClient
+
 class Search:
 
     FOREUP_LOGIN_API = 'https://foreupsoftware.com/index.php/api/booking/users/login' # GET
     FOREUP_TIMES_API = 'https://foreupsoftware.com/index.php/api/booking/times' # POST
     FOREUP_PENDING_RESERVATION_API = 'https://foreupsoftware.com/index.php/api/booking/pending_reservation' # POST
-    FOREUP_REFRESH_PEDNING_RESERVATION_API = 'https://foreupsoftware.com/index.php/api/booking/refresh_pending_reservation'
-
+    FOREUP_REFRESH_PEDNING_RESERVATION_API = 'https://foreupsoftware.com/index.php/api/booking/refresh_pending_reservation'  # POST
     MY_FOREUP_PASSWORD = os.getenv('MY_FOREUP_PASSWORD')
+
+    TEEOFF_HOT_DEALS_API = 'https://www.teeoff.com/api/tee-times/hot-deals-zone' # POST
 
     @staticmethod
     def run(vendor):
@@ -32,6 +33,9 @@ class Search:
             ).order_by('date')
         
         if user_requests:
+
+            session = requests.session()
+
             while True:
                 for user_request in user_requests:
                     user_request.update_status_if_expired()
@@ -39,13 +43,79 @@ class Search:
                         print(f'[{datetime.now().strftime("%Y-%m-%d %I:%M:%S %p")}]')
                         print(f'Searching {user_request.course.name} {user_request.date} times. (Min: {user_request.tee_time_min}, Max: {user_request.tee_time_max})')
 
-                        session = requests.session()
-                        Search.__get_foreupsoftware_session(session, user_request)
-                        Search.__check_for_tee_times(session, user_request)
-                    
+                        if user_request.course.booking_vendor == Course.BookingVendor.FOREUP:
+                            Search.__get_foreupsoftware_session(session, user_request)
+                            Search.__check_for_foreup_tee_times(session, user_request)
+                        elif user_request.course.booking_vendor == Course.BookingVendor.TEEOFF:
+                            Search.__check_for_teeoff_tee_times(session, user_request)
 
     @staticmethod
-    def __check_for_tee_times(session, request_obj):
+    def __check_for_teeoff_tee_times(session, request_obj):
+        for schedule in request_obj.course.courseschedule_set.all():
+            
+            data = {
+                "FacilityId": str(schedule.schedule_id),
+                "PageSize": 100,
+                "PageNumber": 1,
+                "Date": date.today().strftime("%b %d %Y"),
+                "SortBy": "Date",
+                "SortByRollup": "Date",
+                "SortDirection": 0,
+                "SearchType": 1,
+                "View": "List",
+                "HotDealsOnly": True
+            }
+
+            print(f'Searching for {schedule.name} teetime')
+
+
+            custom_user_agent = 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Mobile Safari/537.36'
+            session.headers.update({'User-Agent': custom_user_agent})
+            try:
+                # Make the GET request with data as query parameters
+                response = session.post(Search.TEEOFF_HOT_DEALS_API, data=data)
+
+                # Check if the request was successful (status code 200)
+                if response.status_code == 200:
+                    # Process the API response
+                    api_data = response.json()
+                    # ... Your processing logic here ...
+                    for tee_time in api_data:
+                        if tee_time['available']:
+                            time_obj = datetime.strptime(tee_time['teeTime'], '%Y-%m-%dT%H:%M:%S').time() # 2023-08-10T12:03:00
+                            if request_obj.tee_time_min and time_obj <= request_obj.tee_time_min:
+                                break
+                            if request_obj.tee_time_max and time_obj >= request_obj.tee_time_max:
+                                break
+
+                            teetime_date = datetime.strptime(tee_time['teeTime'], '%Y-%m-%dT%H:%M:%S').date().strftime("%A %m/%d/%y")
+                            message_subject = f'{teetime_date}: {schedule.course.name} @{time_obj.strftime("%I:%M %p")} for {tee_time["rounds"]}.'
+                            print(message_subject)
+
+                            if request_obj.user.usernotifications.text:
+                                TwilioClient.send_message(str(request_obj.user.phone_number), message_subject)
+                            if request_obj.user.usernotifications.email:
+                                checked_at = datetime.now()
+                                book_here_str = f'https://www.teeoff.com/tee-times/facility/{str(schedule.schedule_id)}-{schedule.course.name.replace(" ", "-")}/search'
+                                message_body = f'{message_subject}\nSearched at {checked_at.strftime("%I:%M:%S %p")}\n{book_here_str}'
+                                EmailClient.send_email_with_outlook(request_obj.user.email, message_subject, message_body)
+                else:
+                    print("Request Headers:")
+                    for key, value in response.request.headers.items():
+                        print(f"{key}: {value}")
+                    print(f'Failed to fetch data from the API: {response.status_code} : {response.text}')
+
+            except requests.exceptions.RequestException as e:
+                # Handle exceptions such as network errors
+                print('Error while making API request:', e)
+            # Generate a random sleep duration between 5 and 10 minutes in seconds
+            random_sleep_duration = random.randint(5 * 60, 10 * 60)            
+            # Sleep for the random duration
+            print(f'Sleeping for {random_sleep_duration} seconds')
+            time.sleep(random_sleep_duration)
+
+    @staticmethod
+    def __check_for_foreup_tee_times(session, request_obj):
         for schedule in request_obj.course.courseschedule_set.all():
             print(f'Searching for {schedule.name} teetime')
             data = {
@@ -143,7 +213,7 @@ class Search:
             except requests.exceptions.RequestException as e:
                 # Handle exceptions such as network errors
                 print('Error while making API request:', e)
-            # randomly sleep for 1-10 seconds to avoid getting rate limited
+            # randomly sleep for 1-5 seconds to avoid getting rate limited
             random_float = round(random.uniform(1, 5), 1)
             time.sleep(random_float)
 
