@@ -36,10 +36,10 @@ class Course(models.Model):
 
     class BookingVendor(models.TextChoices):
         FOREUP = "ForeUP", _("ForeUp")
+        TEEOFF = "TeeOff", _("TeeOff")
     booking_vendor = models.CharField(
         max_length=20,
-        choices=BookingVendor.choices,
-        default=BookingVendor.FOREUP,
+        choices=BookingVendor.choices
     )
 
 class CourseSchedule(models.Model):
@@ -56,9 +56,20 @@ class UserTeeTimeRequest(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     course = models.ForeignKey(Course, on_delete=models.PROTECT)
-    date = models.DateField()
+    date = models.DateField(default=None, null=True, blank=True)
+    class RecurringPeriod(models.TextChoices):
+        EVERY_DAY = "every day", _("Every day")
+        WEEKDAYS = "weekdays", _("Weekdays")
+        WEEKENDS = "weekends", _("Weekends")
+    recurring = models.CharField(
+        max_length=20,
+        choices=RecurringPeriod.choices,
+        default=None,
+    )
     tee_time_min = models.TimeField(default=None, null=True, blank=True)
     tee_time_max = models.TimeField(default=None, null=True, blank=True)
+    search_time_min = models.TimeField(default=None, null=True, blank=True)
+    search_time_max = models.TimeField(default=None, null=True, blank=True)
     class Players(models.IntegerChoices):
         ANY = 0
         ONE = 1
@@ -86,18 +97,19 @@ class UserTeeTimeRequest(models.Model):
         default=Status.INACTIVE,
     )
     def update_status_if_expired(self):
-        if date.today() > self.date:
-            self.status = UserTeeTimeRequest.Status.EXPIRED
-            self.save(update_fields=['status'])
-            print(f'Request ID {self.id} expired')
-        elif date.today() == self.date:
-            # stop searching 3hrs and 10 minutes before the teetime
-            if self.course.id.booking_vendor == Course.BookingVendor.FOREUP:
-                if self.tee_time_max is not None:
-                    expiration_time = (self.tee_time_max - timedelta(hours=3, minutes=10)).time()
-                    if datetime.now().time() >= expiration_time:
-                        self.status = UserTeeTimeRequest.Status.EXPIRED
-                        self.save(update_fields=['status'])
+        if self.date is not None:
+            if date.today() > self.date:
+                self.status = UserTeeTimeRequest.Status.EXPIRED
+                self.save(update_fields=['status'])
+                print(f'Request ID {self.id} expired')
+            elif date.today() == self.date:
+                # stop searching 3hrs and 10 minutes before the teetime
+                if self.course.id.booking_vendor == Course.BookingVendor.FOREUP:
+                    if self.tee_time_max is not None:
+                        expiration_time = (self.tee_time_max - timedelta(hours=3, minutes=10)).time()
+                        if datetime.now().time() >= expiration_time:
+                            self.status = UserTeeTimeRequest.Status.EXPIRED
+                            self.save(update_fields=['status'])
 
 
 
