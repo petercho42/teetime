@@ -114,6 +114,20 @@ class UserTeeTimeRequest(models.Model):
                             self.status = UserTeeTimeRequest.Status.EXPIRED
                             self.save(update_fields=['status'])
 
+class MatchingTeeTimeHistoricalRecords(HistoricalRecords):
+    def should_create_historical_record(self, instance, **kwargs):
+        # Check if the 'status', 'available_spots', or 'price' has changed
+        if instance.pk is not None:
+            previous_instance = instance.__class__.objects.get(pk=instance.pk)
+            if instance.status != previous_instance.status:
+                return True
+            elif instance.available_spots != previous_instance.available_spots:
+                return True
+            elif instance.price != previous_instance.price:
+                return True
+        return False
+
+
 class MatchingTeeTime(models.Model):
     '''
     Stores instances of tee-times found per user requests (UserTeeTimeRequest)
@@ -121,6 +135,7 @@ class MatchingTeeTime(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     user_request = models.ForeignKey(UserTeeTimeRequest, on_delete=models.PROTECT)
+    course_schedule = models.ForeignKey(CourseSchedule, on_delete=models.PROTECT)
     class Status(models.TextChoices):
         AVAILABLE = "available", _("Available"),
         GONE = "gone", _("Gone")
@@ -140,7 +155,36 @@ class MatchingTeeTime(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
 
     # Add the HistoricalRecords to track changes
-    history = HistoricalRecords()
+    history = MatchingTeeTimeHistoricalRecords()
+
+
+    @staticmethod
+    def update_or_create_instance(user_request, schedule, tee_time_dict):
+        if user_request.course.booking_vendor == Course.BookingVendor.FOREUP:
+          tee_time_datetime = datetime.strptime(tee_time_dict['teeTime'], '%Y-%m-%dT%H:%M:%S')
+          tee_time_date = tee_time_datetime.date()
+          tee_time_time = tee_time_datetime.time()
+          available_spots = tee_time_dict["rounds"]
+          price = tee_time_dict["formattedPrice"]
+        elif user_request.course.booking_vendor == Course.BookingVendor.TEEOFF:
+            pass
+            
+        lookup_params = {
+            'user_request': user_request,
+            'course_schedule': schedule,
+            'date': tee_time_date,
+            'time': tee_time_time,
+            }
+        defaults = {
+            'available_spots': available_spots,
+            'price': price
+        }
+
+        # Attempt to update the available-spot and price of an existing match or create a new match
+        book, created = MatchingTeeTime.objects.update_or_create(
+            defaults=defaults,
+            **lookup_params
+        )
 
 
 class MatchingTeeTimeNotification(models.Model):

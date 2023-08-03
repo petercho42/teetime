@@ -7,7 +7,7 @@ import time
 
 from datetime import date, datetime, timedelta
 
-from teetimebot.models import Course, UserTeeTimeRequest
+from teetimebot.models import Course, MatchingTeeTime, UserTeeTimeRequest
 from teetimebot.twilio_client import TwilioClient
 from teetimebot.email_client import EmailClient
 
@@ -91,6 +91,8 @@ class Search:
                             teetime_date = datetime.strptime(tee_time['teeTime'], '%Y-%m-%dT%H:%M:%S').date().strftime("%A %m/%d/%y")
                             message_subject = f'{teetime_date}: {schedule.course.name} @{time_obj.strftime("%I:%M %p")} for {tee_time["rounds"]} {(tee_time["formattedPrice"])}.'
                             print(message_subject)
+
+                            MatchingTeeTime.update_or_create_instance(request_obj, tee_time)
 
                             if request_obj.user.usernotifications.text:
                                 TwilioClient.send_message(str(request_obj.user.phone_number), message_subject)
