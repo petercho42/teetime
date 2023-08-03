@@ -9,6 +9,7 @@ charset-normalizer==3.2.0
 Django==4.2.1
 django-phonenumber-field==7.1.0
 django-phonenumbers==1.0.1
+django-simple-history==3.3.0
 frozenlist==1.4.0
 idna==3.4
 multidict==6.0.4

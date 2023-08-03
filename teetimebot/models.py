@@ -7,6 +7,7 @@ from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 
 from phonenumber_field.modelfields import PhoneNumberField
+from simple_history.models import HistoricalRecords
 
 class User(AbstractUser):
     created_at = models.DateTimeField(auto_now_add=True)
@@ -113,6 +114,56 @@ class UserTeeTimeRequest(models.Model):
                             self.status = UserTeeTimeRequest.Status.EXPIRED
                             self.save(update_fields=['status'])
 
+class MatchingTeeTime(models.Model):
+    '''
+    Stores instances of tee-times found per user requests (UserTeeTimeRequest)
+    '''
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    user_request = models.ForeignKey(UserTeeTimeRequest, on_delete=models.PROTECT)
+    class Status(models.TextChoices):
+        AVAILABLE = "available", _("Available"),
+        GONE = "gone", _("Gone")
+    status = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.AVAILABLE,
+    )
+    date = models.DateField()
+    time = models.TimeField()
+    class Players(models.IntegerChoices):
+        ONE = 1
+        TWO = 2
+        THREE = 3
+        FOUR = 4
+    available_spots = models.IntegerField(choices=Players.choices)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+
+    # Add the HistoricalRecords to track changes
+    history = HistoricalRecords()
+
+
+class MatchingTeeTimeNotification(models.Model):
+    '''
+    Snapshot of notification sent to user
+    '''
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    matching_tee_time = models.ForeignKey(MatchingTeeTime, on_delete=models.PROTECT)
+    class Type(models.TextChoices):
+        TEXT = "text", _("Text")
+        EMAIL = "email", _("Email")
+    type = models.CharField(
+        max_length=20,
+        choices=Type.choices,
+    )
+    to_email = models.EmailField(default=None, null=True, blank=True)
+    to_phone_numer = PhoneNumberField(default=None, null=True, blank=True)
+    subject = models.TextField(default=None, null=True, blank=True)
+    body = models.TextField()
+    sent = models.BooleanField()
+    error_type = models.TextField()
+    error_message = models.TextField()
 
 
 class ForeUpUser(models.Model):
