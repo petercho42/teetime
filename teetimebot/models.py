@@ -9,13 +9,16 @@ from django.utils.translation import gettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
 from simple_history.models import HistoricalRecords
 
+from teetimebot.twilio_client import TwilioClient
+from teetimebot.email_client import EmailClient
+
 class User(AbstractUser):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     phone_number = PhoneNumberField()
 
 class UserNotifications(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="notifications")
     text = models.BooleanField(default=False)
     email = models.BooleanField(default=True)
     push = models.BooleanField(default=False)
@@ -50,6 +53,12 @@ class CourseSchedule(models.Model):
     name = models.CharField(max_length=200)
     schedule_id = models.IntegerField()
     booking_class = models.IntegerField(null=True, blank=True)
+
+    def schedule_url(self):
+        if self.course.booking_vendor == Course.BookingVendor.TEEOFF:
+            return f'https://www.teeoff.com/tee-times/facility/{str(self.schedule_id)}-{self.course.name.replace(" ", "-")}/search'
+        elif self.course.booking_vendor == Course.BookingVendor.FOREUP:
+            return f'https://foreupsoftware.com/index.php/booking/{str(self.course.id)}/{str(self.schedule_id)}#/teetimes'
 
 
 class UserTeeTimeRequest(models.Model):
@@ -186,6 +195,51 @@ class MatchingTeeTime(models.Model):
             **lookup_params
         )
 
+@receiver(post_save, sender=MatchingTeeTime)
+def create_match_notification(sender, instance, created, **kwargs):
+    if created:
+        subject = f'{instance.date.strftime("%A %m/%d/%y")}: {instance.course_schedule.name} @{instance.time.strftime("%I:%M %p")} for {instance.available_spots} ${instance.price}.'
+        print(subject)
+        body = f'{subject}\nFound at {instance.updated_at.strftime("%I:%M:%S %p")}\n{instance.course_schedule.schedule_url}'
+        if instance.user_request.user.notifications.text:
+            MatchingTeeTimeNotification.objects.create(
+                matching_tee_time=instance,
+                type=MatchingTeeTimeNotification.Type.TEXT,
+                to_phone_number=instance.user_request.user.phone_number,
+                body=subject, # only send subject as the whole content for texts
+            )
+        if instance.user_request.user.notifications.email:
+            MatchingTeeTimeNotification.objects.create(
+                matching_tee_time=instance,
+                type=MatchingTeeTimeNotification.Type.EMAIL,
+                to_email=instance.user_request.user.email,
+                subject=subject,
+                body=body,
+            )
+    else:
+        if instance.status == MatchingTeeTime.Status.GONE:
+            subject = f'[Gone]{instance.date.strftime("%A %m/%d/%y")}: {instance.course_schedule.name} @{instance.time.strftime("%I:%M %p")} ${instance.price}.'
+            print(subject)
+            body = f'{subject}\nFound at {instance.created_at.strftime("%I:%M:%S %p")}\nGone at {instance.updated_at.strftime("%I:%M:%S %p")}'
+            if instance.user_request.user.notifications.text:
+                MatchingTeeTimeNotification.objects.create(
+                    matching_tee_time=instance,
+                    type=MatchingTeeTimeNotification.Type.TEXT,
+                    to_phone_number=instance.user_request.user.phone_number,
+                    body=subject, # only send subject as the whole content for texts
+                )
+            if instance.user_request.user.notifications.email:
+                MatchingTeeTimeNotification.objects.create(
+                    matching_tee_time=instance,
+                    type=MatchingTeeTimeNotification.Type.EMAIL,
+                    to_email=instance.user_request.user.email,
+                    subject=subject,
+                    body=body,
+                )
+
+
+post_save.connect(create_match_notification, sender=MatchingTeeTime)
+
 
 class MatchingTeeTimeNotification(models.Model):
     '''
@@ -208,6 +262,16 @@ class MatchingTeeTimeNotification(models.Model):
     sent = models.BooleanField()
     error_type = models.TextField()
     error_message = models.TextField()
+
+@receiver(post_save, sender=MatchingTeeTimeNotification)
+def send_match_notification(sender, instance, created, **kwargs):
+    if created:
+        if instance.type == MatchingTeeTimeNotification.Type.TEXT:
+            TwilioClient.send_message(str(instance.to_phone_number), instance.body)
+        elif instance.type == MatchingTeeTimeNotification.Type.EMAIL:
+            EmailClient.send_email_with_outlook(instance.to_email, instance.subject, instance.body)
+
+post_save.connect(send_match_notification, sender=MatchingTeeTimeNotification)
 
 
 class ForeUpUser(models.Model):

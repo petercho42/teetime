@@ -88,19 +88,8 @@ class Search:
                             if request_obj.tee_time_max and time_obj >= request_obj.tee_time_max:
                                 break
 
-                            teetime_date = datetime.strptime(tee_time['teeTime'], '%Y-%m-%dT%H:%M:%S').date().strftime("%A %m/%d/%y")
-                            message_subject = f'{teetime_date}: {schedule.course.name} @{time_obj.strftime("%I:%M %p")} for {tee_time["rounds"]} {(tee_time["formattedPrice"])}.'
-                            print(message_subject)
-
                             MatchingTeeTime.update_or_create_instance(request_obj, tee_time)
 
-                            if request_obj.user.usernotifications.text:
-                                TwilioClient.send_message(str(request_obj.user.phone_number), message_subject)
-                            if request_obj.user.usernotifications.email:
-                                checked_at = datetime.now()
-                                book_here_str = f'https://www.teeoff.com/tee-times/facility/{str(schedule.schedule_id)}-{schedule.course.name.replace(" ", "-")}/search'
-                                message_body = f'{message_subject}\nSearched at {checked_at.strftime("%I:%M:%S %p")}\n{book_here_str}'
-                                EmailClient.send_email_with_outlook(request_obj.user.email, message_subject, message_body)
                 else:
                     print("Request Headers:")
                     for key, value in response.request.headers.items():
