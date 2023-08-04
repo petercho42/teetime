@@ -87,8 +87,7 @@ class Search:
                                 break
                             if request_obj.tee_time_max and time_obj >= request_obj.tee_time_max:
                                 break
-
-                            MatchingTeeTime.update_or_create_instance(request_obj, tee_time)
+                            MatchingTeeTime.update_or_create_instance(request_obj, schedule, tee_time)
 
                 else:
                     print("Request Headers:")
@@ -99,8 +98,8 @@ class Search:
             except requests.exceptions.RequestException as e:
                 # Handle exceptions such as network errors
                 print('Error while making API request:', e)
-            # Generate a random sleep duration between 5 and 10 minutes in seconds
-            random_sleep_duration = random.randint(5 * 60, 10 * 60)            
+            # Generate a random sleep duration between 1 and 5 minutes in seconds
+            random_sleep_duration = random.randint(1 * 60, 5 * 60)            
             # Sleep for the random duration
             print(f'Sleeping for {random_sleep_duration} seconds')
             time.sleep(random_sleep_duration)
@@ -143,11 +142,6 @@ class Search:
                             break
                         if request_obj.tee_time_max and time_obj >= request_obj.tee_time_max:
                             break
-
-                        teetime_date = datetime.strptime(tee_time['time'], '%Y-%m-%d %H:%M').date().strftime("%A %m/%d/%y")
-                        message_subject = f'{teetime_date}: {tee_time["schedule_name"]} @{time_obj.strftime("%I:%M %p")} for {tee_time["available_spots"]}.'
-                        print(message_subject)
-                        
                         pending_reservation_data= {
                             'time': tee_time["time"],
                             'holes': tee_time["holes"],
@@ -167,23 +161,10 @@ class Search:
                         if response.status_code == 200:
                             reservation_id = response.json()['reservation_id']
                             print(f'Created pending reservation {reservation_id}')
-                            refresh_left = 5
-                            pending_reservation_sleep = 15
-                            if request_obj.user.usernotifications.text:
-                                TwilioClient.send_message(str(request_obj.user.phone_number), message_subject)
-                            if request_obj.user.usernotifications.email:
-                                pending_reservation_created_at = datetime.now()
-                                release_time = (pending_reservation_created_at + timedelta(seconds=refresh_left*pending_reservation_sleep)).time()
-                                book_here_str = f'https://foreupsoftware.com/index.php/booking/{tee_time["course_id"]}/{tee_time["schedule_id"]}#/teetimes'
-                                message_body = f"""
-                                {message_subject}
-                                Pending Reservation created at {pending_reservation_created_at.strftime("%I:%M:%S %p")}
-                                Pending Reservation will be at aproximately {release_time.strftime("%I:%M:%S %p")}
-                                {book_here_str}
-                                """
-                                EmailClient.send_email_with_outlook(request_obj.user.email, message_subject, message_body)
+                            MatchingTeeTime.update_or_create_instance(request_obj, schedule, tee_time)
+                            refresh_left = 5  # refresh pending reservation 5 times, 15 seconds each.
                             while refresh_left > 0:
-                                time.sleep(pending_reservation_sleep)
+                                time.sleep(15)
                                 response = session.post(f'{Search.FOREUP_REFRESH_PEDNING_RESERVATION_API}/{reservation_id}', headers=headers)
                                 if response.status_code == 200:
                                     print(F'Pending Reservation Refresh Success')
@@ -195,7 +176,6 @@ class Search:
                                 print(F'Pending Reservation Delete Success')
                             else:
                                 print(f'Failed to delete pending reservation: {response.status_code} : {response.text}')
-                        
                         else:
                             print(f'Failed to create pending reservation: {response.status_code} : {response.text}')
                         

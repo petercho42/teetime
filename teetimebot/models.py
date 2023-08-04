@@ -176,7 +176,11 @@ class MatchingTeeTime(models.Model):
           available_spots = tee_time_dict["rounds"]
           price = tee_time_dict["formattedPrice"]
         elif user_request.course.booking_vendor == Course.BookingVendor.TEEOFF:
-            pass
+            tee_time_datetime = datetime.strptime(tee_time_dict['time'], '%Y-%m-%d %H:%M')
+            tee_time_date = tee_time_datetime.date()
+            tee_time_time = tee_time_datetime.time()
+            available_spots = tee_time_dict["available_spots"]
+            price = tee_time_dict["green_fee"]
             
         lookup_params = {
             'user_request': user_request,
@@ -197,6 +201,17 @@ class MatchingTeeTime(models.Model):
 
 @receiver(post_save, sender=MatchingTeeTime)
 def create_match_notification(sender, instance, created, **kwargs):
+    '''
+        pending_reservation_created_at = datetime.now()
+        release_time = (pending_reservation_created_at + timedelta(seconds=refresh_left*pending_reservation_sleep)).time()
+        book_here_str = f'https://foreupsoftware.com/index.php/booking/{tee_time["course_id"]}/{tee_time["schedule_id"]}#/teetimes'
+        message_body = f"""
+        {message_subject}
+        Pending Reservation created at {pending_reservation_created_at.strftime("%I:%M:%S %p")}
+        Pending Reservation will be at aproximately {release_time.strftime("%I:%M:%S %p")}
+        {book_here_str}
+        """
+    '''
     if created:
         subject = f'{instance.date.strftime("%A %m/%d/%y")}: {instance.course_schedule.name} @{instance.time.strftime("%I:%M %p")} for {instance.available_spots} ${instance.price}.'
         print(subject)

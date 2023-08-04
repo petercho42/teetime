@@ -179,12 +179,12 @@ class Command(BaseCommand):
         user_request = UserTeeTimeRequest.objects.create(
             user=u,
             course=bethpage,
-            date=date(2023, 7, 29),
+            date=date(2023, 8, 12),
             tee_time_min = None,
             tee_time_max = time(8, 00),
             players = UserTeeTimeRequest.Players.ANY,
             holes=UserTeeTimeRequest.Holes.ANY,
-            status=UserTeeTimeRequest.Status.INACTIVE
+            status=UserTeeTimeRequest.Status.ACTIVE
         )
         self.stdout.write(
             self.style.SUCCESS(f'Created UserTeeTimeRequest {user_request.id}')
@@ -193,7 +193,7 @@ class Command(BaseCommand):
         user_request = UserTeeTimeRequest.objects.create(
             user=u,
             course=bethpage,
-            date=date(2023, 8, 6),
+            date=date(2023, 8, 13),
             tee_time_min = None,
             tee_time_max = time(8, 00),
             players = UserTeeTimeRequest.Players.ANY,
