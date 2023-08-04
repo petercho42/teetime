@@ -1,8 +1,9 @@
 from django.core.management.base import BaseCommand, CommandError
 from datetime import date, time
-from teetimebot.models import User, Course, CourseSchedule, UserTeeTimeRequest, ForeUpUser
+from teetimebot.models import User, Course, CourseSchedule, UserTeeTimeRequest, ForeUpUser, MatchingTeeTime, MatchingTeeTimeNotification
 
 from phonenumber_field.phonenumber import PhoneNumber
+from simple_history.models import HistoricalRecords
 
 
 class Command(BaseCommand):
@@ -36,6 +37,18 @@ class Command(BaseCommand):
         Course.objects.all().delete()
         self.stdout.write(
             self.style.SUCCESS(f'Deleted All Course Data')
+        )
+        MatchingTeeTimeNotification.objects.all().delete()
+        self.stdout.write(
+            self.style.SUCCESS(f'Deleted All MatchingTeeTimeNotification Data')
+        )
+        MatchingTeeTime.history.all().delete()
+        self.stdout.write(
+            self.style.SUCCESS(f'Deleted All Historical MatchingTeeTime Data')
+        )
+        MatchingTeeTime.objects.all().delete()
+        self.stdout.write(
+            self.style.SUCCESS(f'Deleted All MatchingTeeTime Data')
         )
 
         '''
