@@ -281,10 +281,14 @@ class MatchingTeeTimeNotification(models.Model):
 @receiver(post_save, sender=MatchingTeeTimeNotification)
 def send_match_notification(sender, instance, created, **kwargs):
     if created:
-        if instance.type == MatchingTeeTimeNotification.Type.TEXT:
-            TwilioClient.send_message(str(instance.to_phone_number), instance.body)
-        elif instance.type == MatchingTeeTimeNotification.Type.EMAIL:
-            EmailClient.send_email_with_outlook(instance.to_email, instance.subject, instance.body)
+        try:
+            if instance.type == MatchingTeeTimeNotification.Type.TEXT:
+                TwilioClient.send_message(str(instance.to_phone_number), instance.body)
+            elif instance.type == MatchingTeeTimeNotification.Type.EMAIL:
+                EmailClient.send_email_with_outlook(instance.to_email, instance.subject, instance.body)
+            instance.update(sent=True)
+        except Exception as e:
+            print(f'Error send_match_notification {e}')
 
 post_save.connect(send_match_notification, sender=MatchingTeeTimeNotification)
 

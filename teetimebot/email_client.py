@@ -56,3 +56,4 @@ class EmailClient:
             print("Email sent successfully.")
         except Exception as e:
             print(f"Outlook Error: {str(e)}")
+            raise
