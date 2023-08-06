@@ -18,6 +18,18 @@ class Command(BaseCommand):
         '''
         Clean Data
         '''
+        MatchingTeeTimeNotification.objects.all().delete()
+        self.stdout.write(
+            self.style.SUCCESS(f'Deleted All MatchingTeeTimeNotification Data')
+        )
+        MatchingTeeTime.objects.all().delete()
+        self.stdout.write(
+            self.style.SUCCESS(f'Deleted All MatchingTeeTime Data')
+        )
+        MatchingTeeTime.history.all().delete()
+        self.stdout.write(
+            self.style.SUCCESS(f'Deleted All Historical MatchingTeeTime Data')
+        )
         UserTeeTimeRequest.objects.all().delete()
         self.stdout.write(
             self.style.SUCCESS(f'Deleted All UserTeeTimeRequest Data')
@@ -37,18 +49,6 @@ class Command(BaseCommand):
         Course.objects.all().delete()
         self.stdout.write(
             self.style.SUCCESS(f'Deleted All Course Data')
-        )
-        MatchingTeeTimeNotification.objects.all().delete()
-        self.stdout.write(
-            self.style.SUCCESS(f'Deleted All MatchingTeeTimeNotification Data')
-        )
-        MatchingTeeTime.history.all().delete()
-        self.stdout.write(
-            self.style.SUCCESS(f'Deleted All Historical MatchingTeeTime Data')
-        )
-        MatchingTeeTime.objects.all().delete()
-        self.stdout.write(
-            self.style.SUCCESS(f'Deleted All MatchingTeeTime Data')
         )
 
         '''

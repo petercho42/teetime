@@ -52,7 +52,6 @@ class Search:
     @staticmethod
     def __check_for_teeoff_tee_times(session, request_obj):
         for schedule in request_obj.course.courseschedule_set.all():
-            
             data = {
                 "FacilityId": str(schedule.schedule_id),
                 "PageSize": 100,
@@ -98,11 +97,11 @@ class Search:
             except requests.exceptions.RequestException as e:
                 # Handle exceptions such as network errors
                 print('Error while making API request:', e)
-            # Generate a random sleep duration between 1 and 5 minutes in seconds
-            random_sleep_duration = random.randint(1 * 60, 5 * 60)            
-            # Sleep for the random duration
-            print(f'Sleeping for {random_sleep_duration} seconds')
-            time.sleep(random_sleep_duration)
+            # Generate a random sleep duration between 30 seconds to 2 minutes in seconds
+        random_sleep_duration = random.randint(30, 2 * 60)            
+        # Sleep for the random duration
+        print(f'Sleeping for {random_sleep_duration} seconds')
+        time.sleep(random_sleep_duration)
 
     @staticmethod
     def __check_for_foreup_tee_times(session, request_obj):

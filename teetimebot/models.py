@@ -54,6 +54,7 @@ class CourseSchedule(models.Model):
     schedule_id = models.IntegerField()
     booking_class = models.IntegerField(null=True, blank=True)
 
+    @property
     def schedule_url(self):
         if self.course.booking_vendor == Course.BookingVendor.TEEOFF:
             return f'https://www.teeoff.com/tee-times/facility/{str(self.schedule_id)}-{self.course.name.replace(" ", "-")}/search'
@@ -170,17 +171,17 @@ class MatchingTeeTime(models.Model):
     @staticmethod
     def update_or_create_instance(user_request, schedule, tee_time_dict):
         if user_request.course.booking_vendor == Course.BookingVendor.FOREUP:
-          tee_time_datetime = datetime.strptime(tee_time_dict['teeTime'], '%Y-%m-%dT%H:%M:%S')
-          tee_time_date = tee_time_datetime.date()
-          tee_time_time = tee_time_datetime.time()
-          available_spots = tee_time_dict["rounds"]
-          price = tee_time_dict["formattedPrice"]
-        elif user_request.course.booking_vendor == Course.BookingVendor.TEEOFF:
             tee_time_datetime = datetime.strptime(tee_time_dict['time'], '%Y-%m-%d %H:%M')
             tee_time_date = tee_time_datetime.date()
             tee_time_time = tee_time_datetime.time()
             available_spots = tee_time_dict["available_spots"]
             price = tee_time_dict["green_fee"]
+        elif user_request.course.booking_vendor == Course.BookingVendor.TEEOFF:
+          tee_time_datetime = datetime.strptime(tee_time_dict['teeTime'], '%Y-%m-%dT%H:%M:%S')
+          tee_time_date = tee_time_datetime.date()
+          tee_time_time = tee_time_datetime.time()
+          available_spots = tee_time_dict["rounds"]
+          price = tee_time_dict["formattedPrice"].replace("$","")
             
         lookup_params = {
             'user_request': user_request,
@@ -274,7 +275,7 @@ class MatchingTeeTimeNotification(models.Model):
     to_phone_numer = PhoneNumberField(default=None, null=True, blank=True)
     subject = models.TextField(default=None, null=True, blank=True)
     body = models.TextField()
-    sent = models.BooleanField()
+    sent = models.BooleanField(default=False)
     error_type = models.TextField()
     error_message = models.TextField()
 
@@ -286,7 +287,8 @@ def send_match_notification(sender, instance, created, **kwargs):
                 TwilioClient.send_message(str(instance.to_phone_number), instance.body)
             elif instance.type == MatchingTeeTimeNotification.Type.EMAIL:
                 EmailClient.send_email_with_outlook(instance.to_email, instance.subject, instance.body)
-            instance.update(sent=True)
+            instance.sent = True
+            instance.save(update_fields=['sent'])
         except Exception as e:
             print(f'Error send_match_notification {e}')
 
