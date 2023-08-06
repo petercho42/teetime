@@ -167,6 +167,11 @@ class MatchingTeeTime(models.Model):
     # Add the HistoricalRecords to track changes
     history = MatchingTeeTimeHistoricalRecords()
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['user_request', 'course_schedule', 'date', 'time'], name='unique_matching_teetime')
+        ]
+
 
     @staticmethod
     def update_or_create_instance(user_request, schedule, tee_time_dict):
