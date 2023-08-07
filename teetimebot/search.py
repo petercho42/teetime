@@ -87,9 +87,7 @@ class Search:
                 if response.status_code == 200:
                     api_data = response.json()
 
-                    available_tee_times = (
-                        []
-                    )  # collecting currently available teetimes to close the ones that are no longer available
+                    available_tee_times = []  # need for closing old teetimes
                     for tee_time in api_data:
                         if tee_time["available"]:
                             time_obj = datetime.strptime(
@@ -161,9 +159,7 @@ class Search:
                     api_data = response.json()
                     # ... Your processing logic here ...
 
-                    available_tee_times = (
-                        []
-                    )  # collecting currently available teetimes to close the ones that are no longer available
+                    available_tee_times = []  # need for closing old teetimes
                     for tee_time in api_data:
                         time_obj = datetime.strptime(
                             tee_time["time"], "%Y-%m-%d %H:%M"
