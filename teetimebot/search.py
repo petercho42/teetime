@@ -98,8 +98,8 @@ class Search:
             except requests.exceptions.RequestException as e:
                 # Handle exceptions such as network errors
                 print('Error while making API request:', e)
-            # Generate a random sleep duration between 30 seconds to 2 minutes in seconds
-        random_sleep_duration = random.randint(30, 2 * 60)            
+
+        random_sleep_duration = random.randint(1, 60)
         # Sleep for the random duration
         print(f'Sleeping for {random_sleep_duration} seconds')
         time.sleep(random_sleep_duration)
