@@ -4,14 +4,16 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('teetimebot', '0012_alter_matchingteetimenotification_sent_and_more'),
+        ("teetimebot", "0012_alter_matchingteetimenotification_sent_and_more"),
     ]
 
     operations = [
         migrations.AddConstraint(
-            model_name='matchingteetime',
-            constraint=models.UniqueConstraint(fields=('user_request', 'course_schedule', 'date', 'time'), name='unique_matching_teetime'),
+            model_name="matchingteetime",
+            constraint=models.UniqueConstraint(
+                fields=("user_request", "course_schedule", "date", "time"),
+                name="unique_matching_teetime",
+            ),
         ),
     ]

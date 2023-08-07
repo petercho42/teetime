@@ -4,35 +4,44 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('teetimebot', '0006_usernotifications'),
+        ("teetimebot", "0006_usernotifications"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='userteetimerequest',
-            name='recurring',
-            field=models.CharField(choices=[('every day', 'Every day'), ('weekdays', 'Weekdays'), ('weekends', 'Weekends')], default=None, max_length=20),
+            model_name="userteetimerequest",
+            name="recurring",
+            field=models.CharField(
+                choices=[
+                    ("every day", "Every day"),
+                    ("weekdays", "Weekdays"),
+                    ("weekends", "Weekends"),
+                ],
+                default=None,
+                max_length=20,
+            ),
         ),
         migrations.AddField(
-            model_name='userteetimerequest',
-            name='search_time_max',
+            model_name="userteetimerequest",
+            name="search_time_max",
             field=models.TimeField(blank=True, default=None, null=True),
         ),
         migrations.AddField(
-            model_name='userteetimerequest',
-            name='search_time_min',
+            model_name="userteetimerequest",
+            name="search_time_min",
             field=models.TimeField(blank=True, default=None, null=True),
         ),
         migrations.AlterField(
-            model_name='course',
-            name='booking_vendor',
-            field=models.CharField(choices=[('ForeUP', 'ForeUp'), ('TeeOff', 'TeeOff')], max_length=20),
+            model_name="course",
+            name="booking_vendor",
+            field=models.CharField(
+                choices=[("ForeUP", "ForeUp"), ("TeeOff", "TeeOff")], max_length=20
+            ),
         ),
         migrations.AlterField(
-            model_name='userteetimerequest',
-            name='date',
+            model_name="userteetimerequest",
+            name="date",
             field=models.DateField(blank=True, default=None, null=True),
         ),
     ]

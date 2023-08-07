@@ -6,20 +6,33 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('teetimebot', '0005_alter_userteetimerequest_status'),
+        ("teetimebot", "0005_alter_userteetimerequest_status"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='UserNotifications',
+            name="UserNotifications",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('text', models.BooleanField(default=False)),
-                ('email', models.BooleanField(default=True)),
-                ('push', models.BooleanField(default=False)),
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("text", models.BooleanField(default=False)),
+                ("email", models.BooleanField(default=True)),
+                ("push", models.BooleanField(default=False)),
+                (
+                    "user",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
     ]

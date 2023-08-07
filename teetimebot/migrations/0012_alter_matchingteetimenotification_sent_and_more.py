@@ -6,20 +6,23 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('teetimebot', '0011_historicalmatchingteetime_course_schedule_and_more'),
+        ("teetimebot", "0011_historicalmatchingteetime_course_schedule_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='matchingteetimenotification',
-            name='sent',
+            model_name="matchingteetimenotification",
+            name="sent",
             field=models.BooleanField(default=False),
         ),
         migrations.AlterField(
-            model_name='usernotifications',
-            name='user',
-            field=models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='notifications', to=settings.AUTH_USER_MODEL),
+            model_name="usernotifications",
+            name="user",
+            field=models.OneToOneField(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="notifications",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
     ]

@@ -2,5 +2,5 @@ from django.apps import AppConfig
 
 
 class TeetimebotConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
-    name = 'teetimebot'
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "teetimebot"

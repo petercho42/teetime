@@ -1,11 +1,16 @@
 from django.core.management.base import BaseCommand, CommandError
 from datetime import date, time
 from teetimebot.email_client import EmailClient
-from teetimebot.models import User, Course, CourseSchedule, UserTeeTimeRequest, ForeUpUser
+from teetimebot.models import (
+    User,
+    Course,
+    CourseSchedule,
+    UserTeeTimeRequest,
+    ForeUpUser,
+)
 from teetimebot.search import Search
 
 from phonenumber_field.phonenumber import PhoneNumber
-
 
 
 class Command(BaseCommand):
@@ -17,10 +22,8 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **options):
-        '''
+        """
         Clean Data
-        '''
+        """
         EmailClient.send_email_with_outlook("petercho42@gmail.com", "subject", "body")
-        self.stdout.write(
-            self.style.SUCCESS(f'Test Done')
-        )
+        self.stdout.write(self.style.SUCCESS(f"Test Done"))

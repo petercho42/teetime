@@ -6,41 +6,95 @@ import phonenumber_field.modelfields
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('teetimebot', '0008_alter_userteetimerequest_recurring'),
+        ("teetimebot", "0008_alter_userteetimerequest_recurring"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='MatchingTeeTime',
+            name="MatchingTeeTime",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('status', models.CharField(choices=[('available', 'Available'), ('gone', 'Gone')], default='available', max_length=20)),
-                ('date', models.DateField()),
-                ('time', models.TimeField()),
-                ('available_spots', models.IntegerField(choices=[(1, 'One'), (2, 'Two'), (3, 'Three'), (4, 'Four')])),
-                ('price', models.DecimalField(decimal_places=2, max_digits=10)),
-                ('user_request', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='teetimebot.userteetimerequest')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[("available", "Available"), ("gone", "Gone")],
+                        default="available",
+                        max_length=20,
+                    ),
+                ),
+                ("date", models.DateField()),
+                ("time", models.TimeField()),
+                (
+                    "available_spots",
+                    models.IntegerField(
+                        choices=[(1, "One"), (2, "Two"), (3, "Three"), (4, "Four")]
+                    ),
+                ),
+                ("price", models.DecimalField(decimal_places=2, max_digits=10)),
+                (
+                    "user_request",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to="teetimebot.userteetimerequest",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='MatchingTeeTimeNotification',
+            name="MatchingTeeTimeNotification",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('type', models.CharField(choices=[('text', 'Text'), ('email', 'Email')], max_length=20)),
-                ('to_email', models.EmailField(blank=True, default=None, max_length=254, null=True)),
-                ('to_phone_numer', phonenumber_field.modelfields.PhoneNumberField(blank=True, default=None, max_length=128, null=True, region=None)),
-                ('subject', models.TextField(blank=True, default=None, null=True)),
-                ('body', models.TextField()),
-                ('sent', models.BooleanField()),
-                ('error_type', models.TextField()),
-                ('error_message', models.TextField()),
-                ('matching_tee_time', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='teetimebot.matchingteetime')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "type",
+                    models.CharField(
+                        choices=[("text", "Text"), ("email", "Email")], max_length=20
+                    ),
+                ),
+                (
+                    "to_email",
+                    models.EmailField(
+                        blank=True, default=None, max_length=254, null=True
+                    ),
+                ),
+                (
+                    "to_phone_numer",
+                    phonenumber_field.modelfields.PhoneNumberField(
+                        blank=True, default=None, max_length=128, null=True, region=None
+                    ),
+                ),
+                ("subject", models.TextField(blank=True, default=None, null=True)),
+                ("body", models.TextField()),
+                ("sent", models.BooleanField()),
+                ("error_type", models.TextField()),
+                ("error_message", models.TextField()),
+                (
+                    "matching_tee_time",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to="teetimebot.matchingteetime",
+                    ),
+                ),
             ],
         ),
     ]

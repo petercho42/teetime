@@ -5,21 +5,31 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('teetimebot', '0010_historicalmatchingteetime'),
+        ("teetimebot", "0010_historicalmatchingteetime"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='historicalmatchingteetime',
-            name='course_schedule',
-            field=models.ForeignKey(blank=True, db_constraint=False, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='+', to='teetimebot.courseschedule'),
+            model_name="historicalmatchingteetime",
+            name="course_schedule",
+            field=models.ForeignKey(
+                blank=True,
+                db_constraint=False,
+                null=True,
+                on_delete=django.db.models.deletion.DO_NOTHING,
+                related_name="+",
+                to="teetimebot.courseschedule",
+            ),
         ),
         migrations.AddField(
-            model_name='matchingteetime',
-            name='course_schedule',
-            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.PROTECT, to='teetimebot.courseschedule'),
+            model_name="matchingteetime",
+            name="course_schedule",
+            field=models.ForeignKey(
+                default=1,
+                on_delete=django.db.models.deletion.PROTECT,
+                to="teetimebot.courseschedule",
+            ),
             preserve_default=False,
         ),
     ]

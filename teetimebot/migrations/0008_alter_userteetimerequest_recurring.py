@@ -4,15 +4,24 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('teetimebot', '0007_userteetimerequest_recurring_and_more'),
+        ("teetimebot", "0007_userteetimerequest_recurring_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='userteetimerequest',
-            name='recurring',
-            field=models.CharField(blank=True, choices=[('every day', 'Every day'), ('weekdays', 'Weekdays'), ('weekends', 'Weekends')], default=None, max_length=20, null=True),
+            model_name="userteetimerequest",
+            name="recurring",
+            field=models.CharField(
+                blank=True,
+                choices=[
+                    ("every day", "Every day"),
+                    ("weekdays", "Weekdays"),
+                    ("weekends", "Weekends"),
+                ],
+                default=None,
+                max_length=20,
+                null=True,
+            ),
         ),
     ]
