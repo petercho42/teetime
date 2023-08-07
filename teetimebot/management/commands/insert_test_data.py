@@ -204,7 +204,7 @@ class Command(BaseCommand):
             user=u,
             course=douglaston,
             # recurring=UserTeeTimeRequest.RecurringPeriod.WEEKDAYS,
-            date=date(2023, 8, 8),
+            date=date(2023, 8, 9),
             search_time_min=time(5, 00),
             search_time_max=time(13, 00),
             status=UserTeeTimeRequest.Status.ACTIVE,
