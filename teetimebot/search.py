@@ -52,11 +52,12 @@ class Search:
     @staticmethod
     def __check_for_teeoff_tee_times(session, request_obj):
         for schedule in request_obj.course.courseschedule_set.all():
+            today = date.today()
             data = {
                 "FacilityId": str(schedule.schedule_id),
                 "PageSize": 100,
                 "PageNumber": 1,
-                "Date": date.today().strftime("%b %d %Y"),
+                "Date": today.strftime("%b %d %Y"),
                 "SortBy": "Date",
                 "SortByRollup": "Date",
                 "SortDirection": 0,
@@ -71,14 +72,13 @@ class Search:
             custom_user_agent = 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Mobile Safari/537.36'
             session.headers.update({'User-Agent': custom_user_agent})
             try:
-                # Make the GET request with data as query parameters
                 response = session.post(Search.TEEOFF_HOT_DEALS_API, data=data)
 
-                # Check if the request was successful (status code 200)
                 if response.status_code == 200:
-                    # Process the API response
+                    
                     api_data = response.json()
-                    # ... Your processing logic here ...
+                    
+                    available_tee_times = []
                     for tee_time in api_data:
                         if tee_time['available']:
                             time_obj = datetime.strptime(tee_time['teeTime'], '%Y-%m-%dT%H:%M:%S').time() # 2023-08-10T12:03:00
@@ -87,7 +87,8 @@ class Search:
                             if request_obj.tee_time_max and time_obj >= request_obj.tee_time_max:
                                 break
                             MatchingTeeTime.update_or_create_instance(request_obj, schedule, tee_time)
-
+                            available_tee_times.append(tee_time['teeTime'])
+                    MatchingTeeTime.process_gone_matching_tee_times(request_obj, schedule, today, available_tee_times)
                 else:
                     print("Request Headers:")
                     for key, value in response.request.headers.items():
@@ -135,6 +136,7 @@ class Search:
                     api_data = response.json()
                     # ... Your processing logic here ...
 
+                    available_tee_times = []
                     for tee_time in api_data:
                         time_obj = datetime.strptime(tee_time['time'], '%Y-%m-%d %H:%M').time()
                         if request_obj.tee_time_min and time_obj <= request_obj.tee_time_min:
@@ -161,6 +163,7 @@ class Search:
                             reservation_id = response.json()['reservation_id']
                             print(f'Created pending reservation {reservation_id}')
                             MatchingTeeTime.update_or_create_instance(request_obj, schedule, tee_time)
+                            available_tee_times.append(tee_time['teeTime'])
                             refresh_left = 5  # refresh pending reservation 5 times, 15 seconds each.
                             while refresh_left > 0:
                                 time.sleep(15)
@@ -177,7 +180,7 @@ class Search:
                                 print(f'Failed to delete pending reservation: {response.status_code} : {response.text}')
                         else:
                             print(f'Failed to create pending reservation: {response.status_code} : {response.text}')
-                        
+                    MatchingTeeTime.process_gone_matching_tee_times(request_obj, schedule, request_obj.date, available_tee_times)   
                 else:
                     print(f'Failed to fetch data from the API: {response.status_code} : {response.text}')
             except requests.exceptions.RequestException as e:

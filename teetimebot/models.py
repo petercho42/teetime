@@ -200,10 +200,20 @@ class MatchingTeeTime(models.Model):
         }
 
         # Attempt to update the available-spot and price of an existing match or create a new match
-        book, created = MatchingTeeTime.objects.update_or_create(
+        match, created = MatchingTeeTime.objects.update_or_create(
             defaults=defaults,
             **lookup_params
         )
+
+    @staticmethod
+    def process_gone_matching_tee_times(user_request, schedule, date, available_tee_times):
+        if user_request.course.booking_vendor == Course.BookingVendor.FOREUP:
+            available_tee_time_objs = [datetime.strptime(tt, '%Y-%m-%d %H:%M').time() for tt in available_tee_times]
+        elif user_request.course.booking_vendor == Course.BookingVendor.TEEOFF:
+            available_tee_time_objs = [datetime.strptime(tt, '%Y-%m-%dT%H:%M:%S').time() for tt in available_tee_times]
+        gone_matches = MatchingTeeTime.objects.filter(user_request=user_request,schedule=schedule, date=date).exclude(time__in=available_tee_time_objs)
+        gone_matches.update(status=MatchingTeeTime.Status.GONE)
+
 
 @receiver(post_save, sender=MatchingTeeTime)
 def create_match_notification(sender, instance, created, **kwargs):
