@@ -63,12 +63,14 @@ class Search:
     @staticmethod
     def __check_for_teeoff_tee_times(session, request_obj):
         for schedule in request_obj.course.courseschedule_set.all():
-            today = date.today()
+            target_date = (
+                request_obj.date if request_obj.date is not None else date.today()
+            )
             data = {
                 "FacilityId": str(schedule.schedule_id),
                 "PageSize": 100,
                 "PageNumber": 1,
-                "Date": today.strftime("%b %d %Y"),
+                "Date": target_date.strftime("%b %d %Y"),
                 "SortBy": "Date",
                 "SortByRollup": "Date",
                 "SortDirection": 0,
@@ -108,7 +110,7 @@ class Search:
                             )
                             available_tee_times.append(tee_time["teeTime"])
                     MatchingTeeTime.process_gone_matching_tee_times(
-                        request_obj, schedule, today, available_tee_times
+                        request_obj, schedule, target_date, available_tee_times
                     )
                 else:
                     print("Request Headers:")
