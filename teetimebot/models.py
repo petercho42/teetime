@@ -196,7 +196,8 @@ class MatchingTeeTime(models.Model):
             }
         defaults = {
             'available_spots': available_spots,
-            'price': price
+            'price': price,
+            'status': MatchingTeeTime.Status.AVAILABLE,
         }
 
         # Attempt to update the available-spot and price of an existing match or create a new match
@@ -236,7 +237,13 @@ def create_match_notification(sender, instance, created, **kwargs):
         {book_here_str}
         """
     '''
-    if created:
+    reemerged = False
+    match_history = MatchingTeeTime.history.filter(id=instance.id).order_by('-history_id')
+    if len(match_history) >= 2:
+        if match_history[0].status == MatchingTeeTime.Status.AVAILABLE and match_history[1].status == MatchingTeeTime.Status.GONE:
+            reemerged = True
+
+    if created or reemerged:
         subject = f'{instance.date.strftime("%A %m/%d/%y")}: {instance.course_schedule.name} @{instance.time.strftime("%I:%M %p")} for {instance.available_spots} ${instance.price}.'
         print(subject)
         body = f'{subject}\nFound at {instance.updated_at.strftime("%I:%M:%S %p")}\n{instance.course_schedule.schedule_url}'
