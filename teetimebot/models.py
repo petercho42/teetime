@@ -211,7 +211,12 @@ class MatchingTeeTime(models.Model):
             available_tee_time_objs = [datetime.strptime(tt, '%Y-%m-%d %H:%M').time() for tt in available_tee_times]
         elif user_request.course.booking_vendor == Course.BookingVendor.TEEOFF:
             available_tee_time_objs = [datetime.strptime(tt, '%Y-%m-%dT%H:%M:%S').time() for tt in available_tee_times]
-        gone_matches = MatchingTeeTime.objects.filter(user_request=user_request,schedule=schedule, date=date).exclude(time__in=available_tee_time_objs)
+        gone_matches = MatchingTeeTime.objects.filter(
+            user_request=user_request,
+            course_schedule=schedule,
+            date=date,
+            status=MatchingTeeTime.Status.AVAILABLE
+            ).exclude(time__in=available_tee_time_objs)
         gone_matches.update(status=MatchingTeeTime.Status.GONE)
 
 
