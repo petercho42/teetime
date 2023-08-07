@@ -78,7 +78,7 @@ class Search:
                     
                     api_data = response.json()
                     
-                    available_tee_times = []
+                    available_tee_times = []  # collecting currently available teetimes to close the ones that are no longer available
                     for tee_time in api_data:
                         if tee_time['available']:
                             time_obj = datetime.strptime(tee_time['teeTime'], '%Y-%m-%dT%H:%M:%S').time() # 2023-08-10T12:03:00
@@ -136,7 +136,7 @@ class Search:
                     api_data = response.json()
                     # ... Your processing logic here ...
 
-                    available_tee_times = []
+                    available_tee_times = []  # collecting currently available teetimes to close the ones that are no longer available
                     for tee_time in api_data:
                         time_obj = datetime.strptime(tee_time['time'], '%Y-%m-%d %H:%M').time()
                         if request_obj.tee_time_min and time_obj <= request_obj.tee_time_min:
