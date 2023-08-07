@@ -217,7 +217,10 @@ class MatchingTeeTime(models.Model):
             date=date,
             status=MatchingTeeTime.Status.AVAILABLE
             ).exclude(time__in=available_tee_time_objs)
-        gone_matches.update(status=MatchingTeeTime.Status.GONE)
+        for match in gone_matches:
+            # save each object individually instead of .update(..) to trigger post_save receiver for notifications
+            match.status = MatchingTeeTime.Status.GONE
+            match.save(update_fields=['status'])
 
 
 @receiver(post_save, sender=MatchingTeeTime)
