@@ -131,7 +131,7 @@ class UserTeeTimeRequest(models.Model):
                 print(f"Request ID {self.id} expired")
             elif date.today() == self.date:
                 # stop searching 3hrs and 10 minutes before the teetime
-                if self.course.id.booking_vendor == Course.BookingVendor.FOREUP:
+                if self.course.booking_vendor == Course.BookingVendor.FOREUP:
                     if self.tee_time_max is not None:
                         expiration_time = (
                             self.tee_time_max - timedelta(hours=3, minutes=10)
