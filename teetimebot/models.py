@@ -23,9 +23,8 @@ class UserNotifications(models.Model):
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, related_name="notifications"
     )
-    text = models.BooleanField(default=False)
+    text = models.BooleanField(default=True)
     email = models.BooleanField(default=True)
-    push = models.BooleanField(default=False)
 
 
 @receiver(post_save, sender=User)
@@ -335,7 +334,7 @@ class MatchingTeeTimeNotification(models.Model):
         choices=Type.choices,
     )
     to_email = models.EmailField(default=None, null=True, blank=True)
-    to_phone_numer = PhoneNumberField(default=None, null=True, blank=True)
+    to_phone_number = PhoneNumberField(default=None, null=True, blank=True)
     subject = models.TextField(default=None, null=True, blank=True)
     body = models.TextField()
     sent = models.BooleanField(default=False)
