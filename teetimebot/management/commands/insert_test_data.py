@@ -53,7 +53,7 @@ class Command(BaseCommand):
         u = User.objects.create(
             first_name="Peter",
             last_name="Cho",
-            email="petercho42@gmail.com",
+            email="monkeydluffy1p1p@gmail.com",
             phone_number=PhoneNumber.from_string("+19172820312"),
         )
         self.stdout.write(

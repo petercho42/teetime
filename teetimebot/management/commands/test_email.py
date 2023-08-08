@@ -25,5 +25,7 @@ class Command(BaseCommand):
         """
         Clean Data
         """
-        EmailClient.send_email_with_outlook("petercho42@gmail.com", "subject", "body")
+        EmailClient.send_email_with_outlook(
+            "monkeydluffy1p1p@gmail.com", "subject", "body"
+        )
         self.stdout.write(self.style.SUCCESS(f"Test Done"))
