@@ -276,6 +276,7 @@ def create_match_notification(sender, instance, created, **kwargs):
     """
     '''
     reemerged = False
+    price_change = False
     match_history = MatchingTeeTime.history.filter(id=instance.id).order_by(
         "-history_id"
     )
@@ -285,11 +286,16 @@ def create_match_notification(sender, instance, created, **kwargs):
             and match_history[1].status == MatchingTeeTime.Status.GONE
         ):
             reemerged = True
+        if match_history[0].price != match_history[1].price:
+            price_change = True
+            old_price = match_history[1].price
 
-    if created or reemerged:
+    if created or reemerged or price_change:
         subject = f'{instance.date.strftime("%A %m/%d/%y")}: {instance.course_schedule.name} @{instance.time.strftime("%I:%M %p")} for {instance.available_spots} ${instance.price}.'
         print(subject)
         body = f'{subject}\nFound at {instance.updated_at.strftime("%I:%M:%S %p")}\n{instance.course_schedule.schedule_url}'
+        if price_change:
+            body = f"Price change: ${old_price} -> ${instance.price}\n{body}"
         if instance.user_request.user.notifications.text:
             MatchingTeeTimeNotification.objects.create(
                 matching_tee_time=instance,
