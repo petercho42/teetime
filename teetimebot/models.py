@@ -264,17 +264,6 @@ class MatchingTeeTime(models.Model):
 
 @receiver(post_save, sender=MatchingTeeTime)
 def create_match_notification(sender, instance, created, **kwargs):
-    '''
-    pending_reservation_created_at = datetime.now()
-    release_time = (pending_reservation_created_at + timedelta(seconds=refresh_left*pending_reservation_sleep)).time()
-    book_here_str = f'https://foreupsoftware.com/index.php/booking/{tee_time["course_id"]}/{tee_time["schedule_id"]}#/teetimes'
-    message_body = f"""
-    {message_subject}
-    Pending Reservation created at {pending_reservation_created_at.strftime("%I:%M:%S %p")}
-    Pending Reservation will be at aproximately {release_time.strftime("%I:%M:%S %p")}
-    {book_here_str}
-    """
-    '''
     reemerged = False
     price_change = False
     match_history = MatchingTeeTime.history.filter(id=instance.id).order_by(
@@ -290,12 +279,24 @@ def create_match_notification(sender, instance, created, **kwargs):
             price_change = True
             old_price = match_history[1].price
 
-    if created or reemerged or price_change:
-        subject = f'{instance.date.strftime("%A %m/%d/%y")}: {instance.course_schedule.name} @{instance.time.strftime("%I:%M %p")} for {instance.available_spots} ${instance.price}.'
+    if (
+        created
+        or reemerged
+        or price_change
+        or instance.status == MatchingTeeTime.Status.GONE
+    ):
+        if instance.status == MatchingTeeTime.Status.AVAILABLE:
+            subject = f'{instance.date.strftime("%A %m/%d/%y")}: {instance.course_schedule.name} @{instance.time.strftime("%I:%M %p")} for {instance.available_spots} ${instance.price}.'
+            body = f'{subject}\nFound at {instance.updated_at.strftime("%I:%M:%S %p")}\n{instance.course_schedule.schedule_url}'
+            if reemerged:
+                subject = f"[Reemerged]{subject}"
+            if price_change:
+                subject = f"[Price Change]{subject}"
+                body = f"Price change: ${old_price} -> ${instance.price}\n{body}"
+        elif instance.status == MatchingTeeTime.Status.GONE:
+            subject = f'[Gone]{instance.date.strftime("%A %m/%d/%y")}: {instance.course_schedule.name} @{instance.time.strftime("%I:%M %p")} ${instance.price}.'
+            body = f'{subject}\nFound at {instance.created_at.strftime("%I:%M:%S %p")}\nGone at {instance.updated_at.strftime("%I:%M:%S %p")}'
         print(subject)
-        body = f'{subject}\nFound at {instance.updated_at.strftime("%I:%M:%S %p")}\n{instance.course_schedule.schedule_url}'
-        if price_change:
-            body = f"Price change: ${old_price} -> ${instance.price}\n{body}"
         if instance.user_request.user.notifications.text:
             MatchingTeeTimeNotification.objects.create(
                 matching_tee_time=instance,
@@ -311,26 +312,6 @@ def create_match_notification(sender, instance, created, **kwargs):
                 subject=subject,
                 body=body,
             )
-    else:
-        if instance.status == MatchingTeeTime.Status.GONE:
-            subject = f'[Gone]{instance.date.strftime("%A %m/%d/%y")}: {instance.course_schedule.name} @{instance.time.strftime("%I:%M %p")} ${instance.price}.'
-            print(subject)
-            body = f'{subject}\nFound at {instance.created_at.strftime("%I:%M:%S %p")}\nGone at {instance.updated_at.strftime("%I:%M:%S %p")}'
-            if instance.user_request.user.notifications.text:
-                MatchingTeeTimeNotification.objects.create(
-                    matching_tee_time=instance,
-                    type=MatchingTeeTimeNotification.Type.TEXT,
-                    to_phone_number=instance.user_request.user.phone_number,
-                    body=subject,  # only send subject as the whole content for texts
-                )
-            if instance.user_request.user.notifications.email:
-                MatchingTeeTimeNotification.objects.create(
-                    matching_tee_time=instance,
-                    type=MatchingTeeTimeNotification.Type.EMAIL,
-                    to_email=instance.user_request.user.email,
-                    subject=subject,
-                    body=body,
-                )
 
 
 post_save.connect(create_match_notification, sender=MatchingTeeTime)
