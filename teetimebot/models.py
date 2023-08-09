@@ -1,7 +1,9 @@
+import time
 from datetime import date, datetime, timedelta
 
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.db.models import Q
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
@@ -110,6 +112,15 @@ class UserTeeTimeRequest(models.Model):
         default=Holes.ANY,
     )
 
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                check=Q(tsearch_time_min__isnull=True, search_time_max__isnull=True)
+                | Q(search_time_min__isnull=False, search_time_max__isnull=False),
+                name="both_fields_null_or_filled",
+            )
+        ]
+
     class Status(models.TextChoices):
         ACTIVE = "active", _("Active")
         INACTIVE = "inactive", _("Inactive")
@@ -138,6 +149,25 @@ class UserTeeTimeRequest(models.Model):
                         if datetime.now().time() >= expiration_time:
                             self.status = UserTeeTimeRequest.Status.EXPIRED
                             self.save(update_fields=["status"])
+
+    def hibernate_if_its_time(self):
+        if self.search_time_min and self.search_time_max:
+            time_now = datetime.now().time()
+            if time_now < self.search_time_min:
+                # Calculate the time difference
+                time_until_min = datetime.combine(
+                    datetime.today(), self.search_time_min
+                ) - datetime.combine(datetime.today(), time_now)
+            elif time_now > self.search_time_max:
+                # Hibernate until the next day self.search_time_min
+                time_until_min = datetime.combine(
+                    datetime.today() + timedelta(days=1), self.search_time_min
+                ) - datetime.combine(datetime.today(), time_now)
+            # Convert the time difference to seconds
+            time_until_min_in_seconds = time_until_min.total_seconds()
+            print(f"Time is not {self.search_time_min} yet")
+            print(f"Hibernating for {time_until_min_in_seconds}")
+            time.sleep(time_until_min_in_seconds)
 
 
 class MatchingTeeTimeHistoricalRecords(HistoricalRecords):
