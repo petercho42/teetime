@@ -70,8 +70,8 @@ class Search:
 
     @staticmethod
     def __check_for_teeoff_tee_times(session, request_obj):
-        for schedule in request_obj.course.courseschedule_set.all():
-            for target_date in request_obj.target_dates:
+        for target_date in request_obj.target_dates:
+            for schedule in request_obj.course.courseschedule_set.all():
                 data = {
                     "FacilityId": str(schedule.schedule_id),
                     "PageSize": 100,
@@ -207,7 +207,7 @@ class Search:
                                 MatchingTeeTime.update_or_create_instance(
                                     request_obj, schedule, tee_time
                                 )
-                                available_tee_times.append(tee_time["teeTime"])
+                                available_tee_times.append(tee_time["time"])
                                 refresh_left = 5  # refresh pending reservation 5 times, 15 seconds each.
                                 while refresh_left > 0:
                                     time.sleep(15)

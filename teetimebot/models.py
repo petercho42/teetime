@@ -399,6 +399,7 @@ def create_match_notification(sender, instance, created, **kwargs):
         or reemerged
         or price_change
         or instance.status == MatchingTeeTime.Status.GONE
+        or instance.user_request.course.booking_vendor == Course.BookingVendor.FOREUP
     ):
         if instance.status == MatchingTeeTime.Status.AVAILABLE:
             subject = f'{instance.date.strftime("%A %m/%d/%y")}: {instance.course_schedule.name} @{instance.time.strftime("%I:%M %p")} for {instance.available_spots} ${instance.price}.'
