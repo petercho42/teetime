@@ -1,15 +1,6 @@
-from django.core.management.base import BaseCommand, CommandError
-from datetime import date, time
-from teetimebot.models import (
-    User,
-    Course,
-    CourseSchedule,
-    UserTeeTimeRequest,
-    ForeUpUser,
-)
+from django.core.management.base import BaseCommand
+from teetimebot.models import Course
 from teetimebot.search import Search
-
-from phonenumber_field.phonenumber import PhoneNumber
 
 
 class Command(BaseCommand):

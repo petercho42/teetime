@@ -1,4 +1,4 @@
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from datetime import date, time
 from teetimebot.models import (
     User,
@@ -11,7 +11,6 @@ from teetimebot.models import (
 )
 
 from phonenumber_field.phonenumber import PhoneNumber
-from simple_history.models import HistoricalRecords
 
 
 class Command(BaseCommand):

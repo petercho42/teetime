@@ -158,35 +158,20 @@ class UserTeeTimeRequest(models.Model):
                 # Expire search 3hrs before the teetime
                 if self.tee_time_max is not None:
                     if self.course.booking_vendor == Course.BookingVendor.FOREUP:
-                        expiration_time = (
-                            self.tee_time_max - timedelta(hours=3)
-                        ).time()
-                        if datetime.now().time() >= expiration_time:
-                            self.status = UserTeeTimeRequest.Status.EXPIRED
-                            self.save(update_fields=["status"])
+                        hours_delta = 3
                     if self.course.booking_vendor == Course.BookingVendor.TEEOFF:
-                        expiration_time = (
-                            self.tee_time_max - timedelta(hours=3)
-                        ).time()
-                        if datetime.now().time() >= expiration_time:
-                            self.status = UserTeeTimeRequest.Status.EXPIRED
-                            self.save(update_fields=["status"])
+                        hours_delta = 1
+                    expiration_time = (
+                        datetime.combine(date.today(), self.tee_time_max)
+                        - timedelta(hours=hours_delta)
+                    ).time()
+                    if datetime.now().time() >= expiration_time:
+                        self.status = UserTeeTimeRequest.Status.EXPIRED
+                        self.save(update_fields=["status"])
+                        print(f"Request ID {self.id} expired")
 
-    def search_time(self):
+    def search_time(self, target_date):
         time_now = datetime.now().time()
-
-        """
-        if self.tee_time_max:
-            # Stop searching x hour before tee_time_max
-            if self.course.booking_vendor == Course.BookingVendor.FOREUP:
-                hours_delta = 3
-            elif self.course.booking_vendor == Course.BookingVendor.TEEOFF:
-                hours_delta = 1
-            expiration_time = (self.tee_time_max - timedelta(hours=hours_delta)).time()
-            if time_now >= expiration_time:
-                print("Won't search: tee_time_max too close")
-                return False
-        """
 
         if self.search_day == UserTeeTimeRequest.SearchDayChoices.WEEKDAYS:
             if date.today().weekday() > 4:
@@ -201,9 +186,19 @@ class UserTeeTimeRequest(models.Model):
             if (time_now < self.search_time_min) or (time_now > self.search_time_max):
                 print(f"Time is not {self.search_time_min} yet")
                 return False
-        print(
-            f"search_time_min: {self.search_time_min}\nsearch_time_max: {self.search_time_max}"
-        )
+        if self.tee_time_max and target_date == date.today():
+            # Stop searching x hour before tee_time_max
+            if self.course.booking_vendor == Course.BookingVendor.FOREUP:
+                hours_delta = 3
+            elif self.course.booking_vendor == Course.BookingVendor.TEEOFF:
+                hours_delta = 1
+            expiration_time = (
+                datetime.combine(date.today(), self.tee_time_max)
+                - timedelta(hours=hours_delta)
+            ).time()
+            if time_now >= expiration_time:
+                print(f"{date.today()} Won't search: tee_time_max too close")
+                return False
         return True
 
     def hibernate(self):
