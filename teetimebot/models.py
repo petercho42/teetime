@@ -11,6 +11,7 @@ from django.utils.translation import gettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
 from simple_history.models import HistoricalRecords
 
+import teetimebot.datetime_helper as datetime_helper
 from teetimebot.twilio_client import TwilioClient
 from teetimebot.email_client import EmailClient
 
@@ -75,14 +76,15 @@ class UserTeeTimeRequest(models.Model):
     course = models.ForeignKey(Course, on_delete=models.PROTECT)
     date = models.DateField(default=None, null=True, blank=True)
 
-    class RecurringPeriod(models.TextChoices):
+    class DaysChoices(models.TextChoices):
         EVERY_DAY = "every day", _("Every day")
         WEEKDAYS = "weekdays", _("Weekdays")
         WEEKENDS = "weekends", _("Weekends")
+        TODAY = "today", _("Today")
 
-    recurring = models.CharField(
+    days = models.CharField(
         max_length=20,
-        choices=RecurringPeriod.choices,
+        choices=DaysChoices.choices,
         default=None,
         null=True,
         blank=True,
@@ -91,6 +93,19 @@ class UserTeeTimeRequest(models.Model):
     tee_time_max = models.TimeField(default=None, null=True, blank=True)
     search_time_min = models.TimeField(default=None, null=True, blank=True)
     search_time_max = models.TimeField(default=None, null=True, blank=True)
+
+    class SearchDayChoices(models.TextChoices):
+        EVERY_DAY = "every day", _("Every day")
+        WEEKDAYS = "weekdays", _("Weekdays")
+        WEEKENDS = "weekends", _("Weekends")
+
+    search_day = models.CharField(
+        max_length=20,
+        choices=SearchDayChoices.choices,
+        default=SearchDayChoices.EVERY_DAY,
+        null=True,
+        blank=True,
+    )
 
     class Players(models.IntegerChoices):
         ANY = 0
@@ -115,7 +130,7 @@ class UserTeeTimeRequest(models.Model):
     class Meta:
         constraints = [
             models.CheckConstraint(
-                check=Q(tsearch_time_min__isnull=True, search_time_max__isnull=True)
+                check=Q(search_time_min__isnull=True, search_time_max__isnull=True)
                 | Q(search_time_min__isnull=False, search_time_max__isnull=False),
                 name="both_fields_null_or_filled",
             )
@@ -140,17 +155,58 @@ class UserTeeTimeRequest(models.Model):
                 self.save(update_fields=["status"])
                 print(f"Request ID {self.id} expired")
             elif date.today() == self.date:
-                # stop searching 3hrs and 10 minutes before the teetime
-                if self.course.booking_vendor == Course.BookingVendor.FOREUP:
-                    if self.tee_time_max is not None:
+                # Expire search 3hrs before the teetime
+                if self.tee_time_max is not None:
+                    if self.course.booking_vendor == Course.BookingVendor.FOREUP:
                         expiration_time = (
-                            self.tee_time_max - timedelta(hours=3, minutes=10)
+                            self.tee_time_max - timedelta(hours=3)
+                        ).time()
+                        if datetime.now().time() >= expiration_time:
+                            self.status = UserTeeTimeRequest.Status.EXPIRED
+                            self.save(update_fields=["status"])
+                    if self.course.booking_vendor == Course.BookingVendor.TEEOFF:
+                        expiration_time = (
+                            self.tee_time_max - timedelta(hours=3)
                         ).time()
                         if datetime.now().time() >= expiration_time:
                             self.status = UserTeeTimeRequest.Status.EXPIRED
                             self.save(update_fields=["status"])
 
-    def hibernate_if_its_time(self):
+    def search_time(self):
+        time_now = datetime.now().time()
+
+        """
+        if self.tee_time_max:
+            # Stop searching x hour before tee_time_max
+            if self.course.booking_vendor == Course.BookingVendor.FOREUP:
+                hours_delta = 3
+            elif self.course.booking_vendor == Course.BookingVendor.TEEOFF:
+                hours_delta = 1
+            expiration_time = (self.tee_time_max - timedelta(hours=hours_delta)).time()
+            if time_now >= expiration_time:
+                print("Won't search: tee_time_max too close")
+                return False
+        """
+
+        if self.search_day == UserTeeTimeRequest.SearchDayChoices.WEEKDAYS:
+            if date.today().weekday() > 4:
+                print(f"Won't search: today is not a weekday")
+                return False
+        elif self.search_day == UserTeeTimeRequest.SearchDayChoices.WEEKENDS:
+            if date.today().weekday() < 5:
+                print(f"Won't search: today is not a weekend")
+                return False
+
+        if self.search_time_min and self.search_time_max:
+            if (time_now < self.search_time_min) or (time_now > self.search_time_max):
+                print(f"Time is not {self.search_time_min} yet")
+                return False
+        print(
+            f"search_time_min: {self.search_time_min}\nsearch_time_max: {self.search_time_max}"
+        )
+        return True
+
+    def hibernate(self):
         if self.search_time_min and self.search_time_max:
             time_now = datetime.now().time()
             if time_now < self.search_time_min:
@@ -163,11 +219,41 @@ class UserTeeTimeRequest(models.Model):
                 time_until_min = datetime.combine(
                     datetime.today() + timedelta(days=1), self.search_time_min
                 ) - datetime.combine(datetime.today(), time_now)
-            # Convert the time difference to seconds
-            time_until_min_in_seconds = time_until_min.total_seconds()
-            print(f"Time is not {self.search_time_min} yet")
-            print(f"Hibernating for {time_until_min_in_seconds}")
-            time.sleep(time_until_min_in_seconds)
+
+            total_seconds = time_until_min.total_seconds()
+
+            # Calculate days, hours, minutes, and seconds
+            days = int(total_seconds // (60 * 60 * 24))
+            hours = int((total_seconds % (60 * 60 * 24)) // (60 * 60))
+            minutes = int((total_seconds % (60 * 60)) // 60)
+            seconds = int(total_seconds % 60)
+
+            time_until_min_str = f"{seconds} seconds"
+            if minutes:
+                time_until_min_str = f"{minutes} minutes, {time_until_min_str}"
+            if hours:
+                time_until_min_str = f"{hours} hours, {time_until_min_str}"
+            if days:
+                time_until_min_str = f"{days} days, {time_until_min_str}"
+
+            print(f"Hibernating for {time_until_min_str}")
+            time.sleep(total_seconds)
+
+    @property
+    def target_dates(self):
+        if self.date:
+            return [self.date]
+        else:
+            if self.days == UserTeeTimeRequest.DaysChoices.TODAY:
+                return [date.today()]
+            elif self.days == UserTeeTimeRequest.DaysChoices.EVERY_DAY:
+                return datetime_helper.get_next_dates()
+            elif self.days == UserTeeTimeRequest.DaysChoices.WEEKDAYS:
+                return datetime_helper.get_next_weekday_dates()
+            elif self.days == UserTeeTimeRequest.DaysChoices.WEEKENDS:
+                return datetime_helper.get_next_weekend_dates()
+            else:
+                raise Exception("TeeTime request is missing target dates!")
 
 
 class MatchingTeeTimeHistoricalRecords(HistoricalRecords):

@@ -172,6 +172,7 @@ class Command(BaseCommand):
         """
         Create UserTeeTimeRequest
         """
+        """
         user_request = UserTeeTimeRequest.objects.create(
             user=u,
             course=bethpage,
@@ -203,14 +204,34 @@ class Command(BaseCommand):
         self.stdout.write(
             self.style.SUCCESS(f"Created UserTeeTimeRequest {user_request.id}")
         )
+        """
+
+        user_request = UserTeeTimeRequest.objects.create(
+            user=u,
+            course=bethpage,
+            # date=date(2023, 8, 13),
+            days=UserTeeTimeRequest.DaysChoices.WEEKENDS,
+            tee_time_min=None,
+            tee_time_max=time(8, 00),
+            search_time_min=time(5, 00),
+            search_time_max=time(20, 00),
+            search_day=UserTeeTimeRequest.SearchDayChoices.EVERY_DAY,
+            players=UserTeeTimeRequest.Players.ANY,
+            holes=UserTeeTimeRequest.Holes.ANY,
+            status=UserTeeTimeRequest.Status.ACTIVE,
+        )
+        self.stdout.write(
+            self.style.SUCCESS(f"Created UserTeeTimeRequest {user_request.id}")
+        )
 
         user_request = UserTeeTimeRequest.objects.create(
             user=u,
             course=douglaston,
-            # recurring=UserTeeTimeRequest.RecurringPeriod.WEEKDAYS,
-            date=date(2023, 8, 11),
+            # date=date(2023, 8, 11),
+            days=UserTeeTimeRequest.DaysChoices.TODAY,
             search_time_min=time(5, 00),
             search_time_max=time(13, 00),
+            search_day=UserTeeTimeRequest.SearchDayChoices.WEEKDAYS,
             status=UserTeeTimeRequest.Status.ACTIVE,
         )
         self.stdout.write(
@@ -220,10 +241,11 @@ class Command(BaseCommand):
         user_request = UserTeeTimeRequest.objects.create(
             user=u,
             course=kissena,
-            # recurring=UserTeeTimeRequest.RecurringPeriod.WEEKDAYS,
-            date=date(2023, 8, 11),
+            # date=date(2023, 8, 11),
+            days=UserTeeTimeRequest.DaysChoices.TODAY,
             search_time_min=time(5, 00),
             search_time_max=time(13, 00),
+            search_day=UserTeeTimeRequest.SearchDayChoices.WEEKDAYS,
             status=UserTeeTimeRequest.Status.ACTIVE,
         )
         self.stdout.write(
