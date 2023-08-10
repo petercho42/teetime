@@ -135,9 +135,11 @@ class Search:
 
     @staticmethod
     def __check_for_foreup_tee_times(session, request_obj):
-        for schedule in request_obj.course.courseschedule_set.all():
-            for target_date in request_obj.target_dates:
-                print(f"Searching for {schedule.name} teetime")
+        for target_date in request_obj.target_dates:
+            for schedule in request_obj.course.courseschedule_set.all():
+                print(
+                    f"Searching for {schedule.name} teetime ({target_date.strftime('%A %m-%d-%Y')})"
+                )
                 data = {
                     "time": "all",
                     "date": target_date.strftime("%m-%d-%Y"),
@@ -244,9 +246,9 @@ class Search:
                 except requests.exceptions.RequestException as e:
                     # Handle exceptions such as network errors
                     print("Error while making API request:", e)
-            # randomly sleep for 1-5 seconds to avoid getting rate limited
-            random_float = round(random.uniform(1, 5), 1)
-            time.sleep(random_float)
+                # randomly sleep for 1-5 seconds to avoid getting rate limited
+                random_float = round(random.uniform(1, 5), 1)
+                time.sleep(random_float)
 
     @staticmethod
     def __get_foreupsoftware_session(session, request_obj):

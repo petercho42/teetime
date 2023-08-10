@@ -26,7 +26,7 @@ class UserNotifications(models.Model):
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, related_name="notifications"
     )
-    text = models.BooleanField(default=True)
+    text = models.BooleanField(default=False)
     email = models.BooleanField(default=True)
 
 
