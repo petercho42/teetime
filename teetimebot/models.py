@@ -242,11 +242,11 @@ class UserTeeTimeRequest(models.Model):
             if self.days == UserTeeTimeRequest.DaysChoices.TODAY:
                 return [date.today()]
             elif self.days == UserTeeTimeRequest.DaysChoices.EVERY_DAY:
-                return datetime_helper.get_next_dates()
+                return datetime_helper.get_next_dates("every_day")
             elif self.days == UserTeeTimeRequest.DaysChoices.WEEKDAYS:
-                return datetime_helper.get_next_weekday_dates()
+                return datetime_helper.get_next_dates("weekdays")
             elif self.days == UserTeeTimeRequest.DaysChoices.WEEKENDS:
-                return datetime_helper.get_next_weekend_dates()
+                return datetime_helper.get_next_dates("weekends")
             else:
                 raise Exception("TeeTime request is missing target dates!")
 
