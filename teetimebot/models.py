@@ -251,20 +251,6 @@ class UserTeeTimeRequest(models.Model):
                 raise Exception("TeeTime request is missing target dates!")
 
 
-class MatchingTeeTimeHistoricalRecords(HistoricalRecords):
-    def should_create_historical_record(self, instance, **kwargs):
-        # Check if the 'status', 'available_spots', or 'price' has changed
-        if instance.pk is not None:
-            previous_instance = instance.__class__.objects.get(pk=instance.pk)
-            if instance.status != previous_instance.status:
-                return True
-            elif instance.available_spots != previous_instance.available_spots:
-                return True
-            elif instance.price != previous_instance.price:
-                return True
-        return False
-
-
 class MatchingTeeTime(models.Model):
     """
     Stores instances of tee-times found per user requests (UserTeeTimeRequest)
@@ -300,7 +286,7 @@ class MatchingTeeTime(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
 
     # Add the HistoricalRecords to track changes
-    history = MatchingTeeTimeHistoricalRecords()
+    history = HistoricalRecords()
 
     class Meta:
         constraints = [
