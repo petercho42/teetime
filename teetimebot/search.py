@@ -42,7 +42,7 @@ class Search:
                     user_request.update_status_if_expired()
                     print(f"\n[{datetime.now().strftime('%Y-%m-%d %I:%M:%S %p')}]")
                     print(
-                        f"Searching {user_request.course.name} [{user_request.date if user_request.date else user_request.days}] times.\ntee_time_min: {user_request.tee_time_min}\ntee_time_max: {user_request.tee_time_max}"
+                        f"Searching {user_request.course.name} [{user_request.date if user_request.date else user_request.days}]\ntee_time_min: {user_request.tee_time_min}\ntee_time_max: {user_request.tee_time_max}"
                     )
                     print(
                         f"search_time_min: {user_request.search_time_min}\nsearch_time_max: {user_request.search_time_max}"
