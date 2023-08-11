@@ -86,7 +86,9 @@ class Search:
                         "HotDealsOnly": True,
                     }
 
-                    print(f"Searching for {schedule.name} teetime")
+                    print(
+                        f"Searching for {schedule.name} teetime ({target_date.strftime('%A %m-%d-%Y')})"
+                    )
 
                     custom_user_agent = "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Mobile Safari/537.36"
                     session.headers.update({"User-Agent": custom_user_agent})
