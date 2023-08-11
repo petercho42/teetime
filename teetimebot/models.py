@@ -78,6 +78,7 @@ class UserTeeTimeRequest(models.Model):
 
     class DaysChoices(models.TextChoices):
         EVERY_DAY = "every day", _("Every day")
+        EVERY_FRIDAY = "every friday", _("Every Friday")
         WEEKDAYS = "weekdays", _("Weekdays")
         WEEKENDS = "weekends", _("Weekends")
         TODAY = "today", _("Today")
@@ -247,6 +248,8 @@ class UserTeeTimeRequest(models.Model):
                 return datetime_helper.get_next_dates("weekdays")
             elif self.days == UserTeeTimeRequest.DaysChoices.WEEKENDS:
                 return datetime_helper.get_next_dates("weekends")
+            elif self.days == UserTeeTimeRequest.DaysChoices.EVERY_FRIDAY:
+                return datetime_helper.get_next_dates("every_friday")
             else:
                 raise Exception("TeeTime request is missing target dates!")
 

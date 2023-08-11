@@ -5,7 +5,7 @@ import redis
 import requests
 import time
 
-from datetime import datetime
+from datetime import datetime, time as datetime_time
 
 from teetimebot.models import Course, MatchingTeeTime, UserTeeTimeRequest
 
@@ -256,9 +256,17 @@ class Search:
                     except requests.exceptions.RequestException as e:
                         # Handle exceptions such as network errors
                         print("Error while making API request:", e)
-                    # randomly sleep for 1-5 seconds to avoid getting rate limited
-                    random_float = round(random.uniform(1, 5), 1)
-                    time.sleep(random_float)
+                    current_time = datetime.now().time()
+                    target_time_start = datetime_time(18, 59, 55)
+                    target_time_end = datetime_time(19, 0, 5)
+                    if target_time_start <= current_time <= target_time_end:
+                        # Bethpage Teetimes are released at 7pm. GO TURBO
+                        print("TURBO BOOST!!")
+                    else:
+                        # randomly sleep for 1-5 seconds to avoid getting rate limited
+                        random_float = round(random.uniform(1, 5), 1)
+                        time.sleep(random_float)
+
             else:
                 time.sleep(1)
 

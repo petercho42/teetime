@@ -2,7 +2,7 @@ from datetime import date, datetime, time, timedelta
 
 
 def get_next_dates(days):
-    allowed_inputs = ["every_day", "weekdays", "weekends"]
+    allowed_inputs = ["every_day", "weekdays", "weekends", "every_friday"]
 
     if days not in allowed_inputs:
         raise ValueError(f"Invalid input: {days}")
@@ -20,6 +20,10 @@ def get_next_dates(days):
         elif days == "weekends":
             current_weekday = current_date.weekday()
             if current_weekday > 4:  # Saturday and Sunday
+                dates.append(current_date)
+        elif days == "every_friday":
+            current_weekday = current_date.weekday()
+            if current_weekday == 4:  # Friday
                 dates.append(current_date)
         current_date += timedelta(days=1)
         num_days -= 1
