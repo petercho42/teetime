@@ -42,7 +42,7 @@ class Search:
                     user_request.update_status_if_expired()
                     print(f"\n[{datetime.now().strftime('%Y-%m-%d %I:%M:%S %p')}]")
                     print(
-                        f"Searching {user_request.course.name} [{user_request.date if user_request.date else user_request.days}] times.\ntee_time_min: {user_request.tee_time_min}\ntee_time_max: {user_request.tee_time_max}"
+                        f"Searching {user_request.course.name} [{user_request.date if user_request.date else user_request.days}]\ntee_time_min: {user_request.tee_time_min}\ntee_time_max: {user_request.tee_time_max}"
                     )
                     print(
                         f"search_time_min: {user_request.search_time_min}\nsearch_time_max: {user_request.search_time_max}"
@@ -86,7 +86,9 @@ class Search:
                         "HotDealsOnly": True,
                     }
 
-                    print(f"Searching for {schedule.name} teetime")
+                    print(
+                        f"Searching for {schedule.name} teetime ({target_date.strftime('%A %m-%d-%Y')})"
+                    )
 
                     custom_user_agent = "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Mobile Safari/537.36"
                     session.headers.update({"User-Agent": custom_user_agent})
