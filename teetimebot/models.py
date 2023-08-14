@@ -365,6 +365,7 @@ class MatchingTeeTime(models.Model):
 def create_match_notification(sender, instance, created, **kwargs):
     reemerged = False
     price_change = False
+    spots_change = False
     match_history = MatchingTeeTime.history.filter(id=instance.id).order_by(
         "-history_id"
     )
@@ -377,11 +378,15 @@ def create_match_notification(sender, instance, created, **kwargs):
         if match_history[0].price != match_history[1].price:
             price_change = True
             old_price = match_history[1].price
+        if match_history[0].available_spots != match_history[1].available_spots:
+            spots_change = True
+            old_spots = match_history[1].available_spots
 
     if (
         created
         or reemerged
         or price_change
+        or spots_change
         or instance.status == MatchingTeeTime.Status.GONE
         or instance.user_request.course.booking_vendor == Course.BookingVendor.FOREUP
     ):
@@ -393,6 +398,9 @@ def create_match_notification(sender, instance, created, **kwargs):
             if price_change:
                 subject = f"[Price Change]{subject}"
                 body = f"Price change: ${old_price} -> ${instance.price}\n{body}"
+            if spots_change:
+                subject = f"[Available Spots Change]{subject}"
+                body = f"Available spots change: ${old_spots} -> ${instance.available_spots}\n{body}"
         elif instance.status == MatchingTeeTime.Status.GONE:
             subject = f'[Gone]{instance.date.strftime("%A %m/%d/%y")}: {instance.course_schedule.name} @{instance.time.strftime("%I:%M %p")} ${instance.price}.'
             body = f'{subject}\nFound at {instance.created_at.strftime("%I:%M:%S %p")}\nGone at {instance.updated_at.strftime("%I:%M:%S %p")}'
