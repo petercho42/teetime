@@ -400,7 +400,7 @@ def create_match_notification(sender, instance, created, **kwargs):
                 body = f"Price change: ${old_price} -> ${instance.price}\n{body}"
             if spots_change:
                 subject = f"[Available Spots Change]{subject}"
-                body = f"Available spots change: ${old_spots} -> ${instance.available_spots}\n{body}"
+                body = f"Available spots change: {old_spots} -> {instance.available_spots}\n{body}"
         elif instance.status == MatchingTeeTime.Status.GONE:
             subject = f'[Gone]{instance.date.strftime("%A %m/%d/%y")}: {instance.course_schedule.name} @{instance.time.strftime("%I:%M %p")} ${instance.price}.'
             body = f'{subject}\nFound at {instance.created_at.strftime("%I:%M:%S %p")}\nGone at {instance.updated_at.strftime("%I:%M:%S %p")}'
