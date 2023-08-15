@@ -86,7 +86,6 @@ class Command(BaseCommand):
         """
         Create CourseSchedule
         """
-        """
         bethpage_black = CourseSchedule.objects.create(
             course=bethpage,
             name="Bethpage Black Course",
@@ -96,7 +95,6 @@ class Command(BaseCommand):
         self.stdout.write(
             self.style.SUCCESS(f"Created CourseSchedule {bethpage_black.name}")
         )
-        """
 
         bethpage_red = CourseSchedule.objects.create(
             course=bethpage,
@@ -173,15 +171,15 @@ class Command(BaseCommand):
         """
         Create UserTeeTimeRequest
         """
-        """
+
         user_request = UserTeeTimeRequest.objects.create(
             user=u,
             course=bethpage,
-            date=date(2023, 8, 12),
+            date=date(2023, 8, 20),
             tee_time_min=None,
-            tee_time_max=time(8, 00),
+            tee_time_max=time(8, 15),
             search_time_min=time(5, 00),
-            search_time_max=time(20, 00),
+            search_time_max=time(21, 00),
             players=UserTeeTimeRequest.Players.ANY,
             holes=UserTeeTimeRequest.Holes.ANY,
             status=UserTeeTimeRequest.Status.ACTIVE,
@@ -193,24 +191,6 @@ class Command(BaseCommand):
         user_request = UserTeeTimeRequest.objects.create(
             user=u,
             course=bethpage,
-            date=date(2023, 8, 13),
-            tee_time_min=None,
-            tee_time_max=time(8, 00),
-            search_time_min=time(5, 00),
-            search_time_max=time(20, 00),
-            players=UserTeeTimeRequest.Players.ANY,
-            holes=UserTeeTimeRequest.Holes.ANY,
-            status=UserTeeTimeRequest.Status.ACTIVE,
-        )
-        self.stdout.write(
-            self.style.SUCCESS(f"Created UserTeeTimeRequest {user_request.id}")
-        )
-        """
-
-        user_request = UserTeeTimeRequest.objects.create(
-            user=u,
-            course=bethpage,
-            # date=date(2023, 8, 13),
             days=UserTeeTimeRequest.DaysChoices.WEEKENDS,
             tee_time_min=None,
             tee_time_max=time(8, 00),
@@ -228,7 +208,6 @@ class Command(BaseCommand):
         user_request = UserTeeTimeRequest.objects.create(
             user=u,
             course=bethpage,
-            # date=date(2023, 8, 13),
             days=UserTeeTimeRequest.DaysChoices.EVERY_FRIDAY,
             tee_time_min=time(10, 00),
             tee_time_max=time(11, 00),
@@ -237,7 +216,7 @@ class Command(BaseCommand):
             search_day=UserTeeTimeRequest.SearchDayChoices.EVERY_DAY,
             players=UserTeeTimeRequest.Players.ANY,
             holes=UserTeeTimeRequest.Holes.ANY,
-            status=UserTeeTimeRequest.Status.ACTIVE,
+            status=UserTeeTimeRequest.Status.INACTIVE,
         )
         self.stdout.write(
             self.style.SUCCESS(f"Created UserTeeTimeRequest {user_request.id}")
@@ -246,12 +225,11 @@ class Command(BaseCommand):
         user_request = UserTeeTimeRequest.objects.create(
             user=u,
             course=douglaston,
-            # date=date(2023, 8, 11),
             days=UserTeeTimeRequest.DaysChoices.TODAY,
             search_time_min=time(5, 00),
             search_time_max=time(13, 00),
             search_day=UserTeeTimeRequest.SearchDayChoices.WEEKDAYS,
-            status=UserTeeTimeRequest.Status.ACTIVE,
+            status=UserTeeTimeRequest.Status.INACTIVE,
         )
         self.stdout.write(
             self.style.SUCCESS(f"Created UserTeeTimeRequest {user_request.id}")
@@ -260,12 +238,11 @@ class Command(BaseCommand):
         user_request = UserTeeTimeRequest.objects.create(
             user=u,
             course=kissena,
-            # date=date(2023, 8, 11),
             days=UserTeeTimeRequest.DaysChoices.TODAY,
             search_time_min=time(5, 00),
             search_time_max=time(13, 00),
             search_day=UserTeeTimeRequest.SearchDayChoices.WEEKDAYS,
-            status=UserTeeTimeRequest.Status.ACTIVE,
+            status=UserTeeTimeRequest.Status.INACTIVE,
         )
         self.stdout.write(
             self.style.SUCCESS(f"Created UserTeeTimeRequest {user_request.id}")
