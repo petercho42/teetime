@@ -105,8 +105,6 @@ class Search:
                 print(
                     f"Searching for {schedule.name} teetime ({target_date.strftime('%A %m-%d-%Y')})"
                 )
-                print(form_data)
-                # break
 
                 try:
                     response = session.post(

@@ -298,6 +298,7 @@ class Command(BaseCommand):
             date=date(2023, 8, 26),
             tee_time_min=time(12, 00),
             tee_time_max=time(15, 00),
+            players=UserTeeTimeRequest.Players.FOUR,
             status=UserTeeTimeRequest.Status.ACTIVE,
         )
         self.stdout.write(
