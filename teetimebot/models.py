@@ -51,6 +51,7 @@ class Course(models.Model):
         TEEOFF = "TeeOff", _("TeeOff")
 
     booking_vendor = models.CharField(max_length=20, choices=BookingVendor.choices)
+    course_id = models.IntegerField(null=True, blank=True)
 
 
 class CourseSchedule(models.Model):
@@ -66,7 +67,7 @@ class CourseSchedule(models.Model):
         if self.course.booking_vendor == Course.BookingVendor.TEEOFF:
             return f'https://www.teeoff.com/tee-times/facility/{str(self.schedule_id)}-{self.course.name.replace(" ", "-")}/search'
         elif self.course.booking_vendor == Course.BookingVendor.FOREUP:
-            return f"https://foreupsoftware.com/index.php/booking/{str(self.course.id)}/{str(self.schedule_id)}#/teetimes"
+            return f"https://foreupsoftware.com/index.php/booking/{str(self.course.course_id)}/{str(self.schedule_id)}#/teetimes"
 
 
 class UserTeeTimeRequest(models.Model):

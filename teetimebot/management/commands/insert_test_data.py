@@ -80,6 +80,7 @@ class Command(BaseCommand):
         bethpage = Course.objects.create(
             name="Bethpage State Park",
             booking_vendor=Course.BookingVendor.FOREUP,
+            course_id=19765,
         )
         self.stdout.write(self.style.SUCCESS(f"Created Course {bethpage.name}"))
 
