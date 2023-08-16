@@ -16,6 +16,8 @@ class Command(BaseCommand):
                 Search.run(Course.BookingVendor.FOREUP)
             elif vendor.lower() == Course.BookingVendor.TEEOFF.lower():
                 Search.run(Course.BookingVendor.TEEOFF)
+            elif vendor.lower() == Course.BookingVendor.GOIBSVISION.lower():
+                Search.run(Course.BookingVendor.GOIBSVISION)
             else:
                 self.stdout.write(self.style.ERROR(f"Unknown vendor: {vendor}"))
             self.stdout.write(self.style.SUCCESS("Search Done"))

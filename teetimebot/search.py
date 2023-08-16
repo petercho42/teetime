@@ -23,8 +23,13 @@ class Search:
 
     TEEOFF_HOT_DEALS_API = "https://www.teeoff.com/api/tee-times/hot-deals-zone"  # POST
 
+    GOIBSVISION_BROWSE_API = (
+        "https://www.goibsvision.com/WebRes/Club/harborlinks/BrowseTeeTimes"  # POST
+    )
+
     @staticmethod
     def run(vendor):
+        session = requests.session()
         while True:
             user_requests = (
                 UserTeeTimeRequest.objects.select_related("course")
@@ -37,7 +42,6 @@ class Search:
             )
 
             if user_requests:
-                session = requests.session()
                 for user_request in user_requests:
                     user_request.update_status_if_expired()
                     print(f"\n[{datetime.now().strftime('%Y-%m-%d %I:%M:%S %p')}]")
@@ -60,13 +64,100 @@ class Search:
                             == Course.BookingVendor.TEEOFF
                         ):
                             Search.__check_for_teeoff_tee_times(session, user_request)
-                            random_sleep_duration = random.randint(1, 60)
-                            # Sleep for the random duration
-                            print(f"Sleeping for {random_sleep_duration} seconds")
-                            time.sleep(random_sleep_duration)
+                        elif (
+                            user_request.course.booking_vendor
+                            == Course.BookingVendor.GOIBSVISION
+                        ):
+                            Search.__check_for_goibsvision_tee_times(
+                                session, user_request
+                            )
             else:
                 print(f"No active requests found. Sleeping for 60 seconds")
                 time.sleep(60)
+
+    @staticmethod
+    def __check_for_goibsvision_tee_times(session, request_obj):
+        for target_date in request_obj.target_dates:
+            if request_obj.search_time(target_date):
+                form_data = {
+                    "CriteriaDate": target_date.strftime("%-m/%-d/%Y"),
+                    "date": target_date.strftime("%-m/%-d/%Y"),
+                    "CriteriaTime": "10:00 AM",
+                    "NumberOfPlayers": request_obj.players,
+                    "Holes": "18",
+                    "Criteria.Facilities.Count": "3",
+                    "X-Requested-With": "XMLHttpRequest",
+                }
+                for index, schedule in enumerate(
+                    request_obj.course.courseschedule_set.all()
+                ):
+                    if index == 0:
+                        form_data[f"Facilities[{index}].IsChecked"] = "true"
+                    else:
+                        form_data[f"Facilities[{index}].IsChecked"] = "false"
+                    facility_info = {
+                        f"Facilities[{index}].FacilityID": schedule.facility_id,
+                        f"Facilities[{index}].ConsoleFacilityID": schedule.console_facility_id,
+                        "Facilities[0].IsFavorite": "False",
+                    }
+                    form_data = {**form_data, **facility_info}
+
+                print(
+                    f"Searching for {schedule.name} teetime ({target_date.strftime('%A %m-%d-%Y')})"
+                )
+                print(form_data)
+                # break
+
+                try:
+                    response = session.post(
+                        Search.GOIBSVISION_BROWSE_API, data=form_data
+                    )
+
+                    if response.status_code == 200:
+                        print(response.content.decode("utf-8"))
+                        break
+                        api_data = response.json()
+
+                        available_tee_times = []  # need for closing old teetimes
+                        for tee_time in api_data:
+                            if tee_time["available"]:
+                                time_obj = datetime.strptime(
+                                    tee_time["teeTime"], "%Y-%m-%dT%H:%M:%S"
+                                ).time()  # 2023-08-10T12:03:00
+                                if (
+                                    request_obj.tee_time_min
+                                    and time_obj <= request_obj.tee_time_min
+                                ):
+                                    break
+                                if (
+                                    request_obj.tee_time_max
+                                    and time_obj >= request_obj.tee_time_max
+                                ):
+                                    break
+                                MatchingTeeTime.update_or_create_instance(
+                                    request_obj, schedule, tee_time
+                                )
+                                available_tee_times.append(tee_time["teeTime"])
+                        MatchingTeeTime.process_gone_matching_tee_times(
+                            request_obj, schedule, target_date, available_tee_times
+                        )
+                    else:
+                        print("Request Headers:")
+                        for key, value in response.request.headers.items():
+                            print(f"{key}: {value}")
+                        print(
+                            f"Failed to fetch data from the API: {response.status_code} : {response.text}"
+                        )
+                except requests.exceptions.RequestException as e:
+                    # Handle exceptions such as network errors
+                    print("Error while making API request:", e)
+                    time.sleep(2)
+            else:
+                time.sleep(1)
+        random_sleep_duration = random.randint(1, 60)
+        # Sleep for the random duration
+        print(f"Sleeping for {random_sleep_duration} seconds")
+        time.sleep(random_sleep_duration)
 
     @staticmethod
     def __check_for_teeoff_tee_times(session, request_obj):
@@ -131,8 +222,13 @@ class Search:
                     except requests.exceptions.RequestException as e:
                         # Handle exceptions such as network errors
                         print("Error while making API request:", e)
+                        time.sleep(2)
             else:
                 time.sleep(1)
+        random_sleep_duration = random.randint(1, 60)
+        # Sleep for the random duration
+        print(f"Sleeping for {random_sleep_duration} seconds")
+        time.sleep(random_sleep_duration)
 
     @staticmethod
     def __check_for_foreup_tee_times(session, request_obj):
@@ -256,6 +352,7 @@ class Search:
                     except requests.exceptions.RequestException as e:
                         # Handle exceptions such as network errors
                         print("Error while making API request:", e)
+                        time.sleep(2)
                     """
                     current_time = datetime.now().time()
                     target_time_start = datetime_time(18, 59, 55)

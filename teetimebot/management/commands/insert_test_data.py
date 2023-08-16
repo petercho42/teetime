@@ -75,7 +75,7 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(f"Created ForeUpUser {foreup_u.username}"))
 
         """
-        Create Course
+        Create Bethpage Course
         """
         bethpage = Course.objects.create(
             name="Bethpage State Park",
@@ -85,7 +85,7 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(f"Created Course {bethpage.name}"))
 
         """
-        Create CourseSchedule
+        Create Bethpage Courses CourseSchedule
         """
         bethpage_black = CourseSchedule.objects.create(
             course=bethpage,
@@ -138,7 +138,7 @@ class Command(BaseCommand):
         )
 
         """
-        Create Course
+        Create Douglaston Course
         """
         douglaston = Course.objects.create(
             name="Douglaston Golf Course",
@@ -154,7 +154,7 @@ class Command(BaseCommand):
         )
 
         """
-        Create Course
+        Create Kissena Course
         """
         kissena = Course.objects.create(
             name="Kissena Golf Course",
@@ -167,6 +167,49 @@ class Command(BaseCommand):
         )
         self.stdout.write(
             self.style.SUCCESS(f"Created CourseSchedule {kissena_eighteen.name}")
+        )
+
+        """
+        Create Harbor Links Course
+        """
+        harbor_links = Course.objects.create(
+            name="Harbor Links Golf Course",
+            booking_vendor=Course.BookingVendor.GOIBSVISION,
+        )
+        self.stdout.write(self.style.SUCCESS(f"Created Course {harbor_links.name}"))
+
+        harbor_links_championship_course = CourseSchedule.objects.create(
+            course=harbor_links,
+            name="Harbor Links Championship Course",
+            facility_id="24d73934-5205-4b14-b1cc-1f7daeb919a4",
+            console_facility_id="baf38b57-7a39-42ce-ab35-9f40bc7d5de8",
+        )
+        self.stdout.write(
+            self.style.SUCCESS(
+                f"Created CourseSchedule {harbor_links_championship_course.name}"
+            )
+        )
+        harbor_links_champcourse_back_9 = CourseSchedule.objects.create(
+            course=harbor_links,
+            name="Harbor Links ChampCourse Back Nine",
+            facility_id="e6b9aa2b-92ca-4021-af9b-9696ea9ddbfc",
+            console_facility_id="5f569fa1-d03a-4854-8a8c-44cc2c83fe84",
+        )
+        self.stdout.write(
+            self.style.SUCCESS(
+                f"Created CourseSchedule {harbor_links_champcourse_back_9.name}"
+            )
+        )
+        harbor_links_executive_course = CourseSchedule.objects.create(
+            course=harbor_links,
+            name="Harbor Links 	Executive Course",
+            facility_id="73cf891c-d49d-49e1-820c-63f226440534",
+            console_facility_id="04266ec3-23b4-4b7d-8f12-c80e66e38f38",
+        )
+        self.stdout.write(
+            self.style.SUCCESS(
+                f"Created CourseSchedule {harbor_links_executive_course.name}"
+            )
         )
 
         """
@@ -244,6 +287,18 @@ class Command(BaseCommand):
             search_time_max=time(13, 00),
             search_day=UserTeeTimeRequest.SearchDayChoices.WEEKDAYS,
             status=UserTeeTimeRequest.Status.INACTIVE,
+        )
+        self.stdout.write(
+            self.style.SUCCESS(f"Created UserTeeTimeRequest {user_request.id}")
+        )
+
+        user_request = UserTeeTimeRequest.objects.create(
+            user=u,
+            course=harbor_links,
+            date=date(2023, 8, 26),
+            tee_time_min=time(12, 00),
+            tee_time_max=time(15, 00),
+            status=UserTeeTimeRequest.Status.ACTIVE,
         )
         self.stdout.write(
             self.style.SUCCESS(f"Created UserTeeTimeRequest {user_request.id}")

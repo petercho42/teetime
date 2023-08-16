@@ -49,6 +49,7 @@ class Course(models.Model):
     class BookingVendor(models.TextChoices):
         FOREUP = "ForeUP", _("ForeUp")
         TEEOFF = "TeeOff", _("TeeOff")
+        GOIBSVISION = "GOIBSVISION", _("GOIBSVISION")
 
     booking_vendor = models.CharField(max_length=20, choices=BookingVendor.choices)
     course_id = models.IntegerField(null=True, blank=True)
@@ -59,8 +60,12 @@ class CourseSchedule(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     course = models.ForeignKey(Course, on_delete=models.PROTECT)
     name = models.CharField(max_length=200)
-    schedule_id = models.IntegerField()
-    booking_class = models.IntegerField(null=True, blank=True)
+    schedule_id = models.IntegerField(null=True, blank=True)
+    booking_class = models.IntegerField(null=True, blank=True)  # foreup
+    facility_id = models.CharField(max_length=200, null=True, blank=True)  # goibsvision
+    console_facility_id = models.CharField(
+        max_length=200, null=True, blank=True
+    )  # goibsvision
 
     @property
     def schedule_url(self):
