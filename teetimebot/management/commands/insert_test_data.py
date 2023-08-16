@@ -258,7 +258,7 @@ class Command(BaseCommand):
             search_time_min=time(5, 00),
             search_time_max=time(20, 00),
             search_day=UserTeeTimeRequest.SearchDayChoices.EVERY_DAY,
-            players=UserTeeTimeRequest.Players.ANY,
+            players=UserTeeTimeRequest.Players.FOUR,
             holes=UserTeeTimeRequest.Holes.ANY,
             status=UserTeeTimeRequest.Status.INACTIVE,
         )

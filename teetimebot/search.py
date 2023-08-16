@@ -7,6 +7,7 @@ import time
 
 from datetime import datetime, time as datetime_time
 
+from teetimebot.goibsvision_helper import parse_goibsvision_html
 from teetimebot.models import Course, MatchingTeeTime, UserTeeTimeRequest
 
 
@@ -112,9 +113,11 @@ class Search:
                     )
 
                     if response.status_code == 200:
-                        print(response.content.decode("utf-8"))
+                        api_data = parse_goibsvision_html(
+                            response.content.decode("utf-8")
+                        )
+                        print(api_data)
                         break
-                        api_data = response.json()
 
                         available_tee_times = []  # need for closing old teetimes
                         for tee_time in api_data:
