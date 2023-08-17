@@ -73,6 +73,8 @@ class CourseSchedule(models.Model):
             return f'https://www.teeoff.com/tee-times/facility/{str(self.schedule_id)}-{self.course.name.replace(" ", "-")}/search'
         elif self.course.booking_vendor == Course.BookingVendor.FOREUP:
             return f"https://foreupsoftware.com/index.php/booking/{str(self.course.course_id)}/{str(self.schedule_id)}#/teetimes"
+        elif self.course.booking_vendor == Course.BookingVendor.GOIBSVISION:
+            return "https://www.goibsvision.com/WebRes/Club/harborlinks/Browse"
 
 
 class UserTeeTimeRequest(models.Model):
