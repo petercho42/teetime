@@ -323,6 +323,11 @@ class MatchingTeeTime(models.Model):
             tee_time_time = tee_time_datetime.time()
             available_spots = tee_time_dict["rounds"]
             price = tee_time_dict["formattedPrice"].replace("$", "")
+        elif user_request.course.booking_vendor == Course.BookingVendor.GOIBSVISION:
+            tee_time_date = user_request.date
+            tee_time_time = datetime.strptime(tee_time_dict["time"], "%I:%M %p").time()
+            available_spots = tee_time_dict["players"]
+            price = tee_time_dict["price"].replace("$", "")
 
         lookup_params = {
             "user_request": user_request,
@@ -345,22 +350,12 @@ class MatchingTeeTime(models.Model):
     def process_gone_matching_tee_times(
         user_request, schedule, date, available_tee_times
     ):
-        if user_request.course.booking_vendor == Course.BookingVendor.FOREUP:
-            available_tee_time_objs = [
-                datetime.strptime(tt, "%Y-%m-%d %H:%M").time()
-                for tt in available_tee_times
-            ]
-        elif user_request.course.booking_vendor == Course.BookingVendor.TEEOFF:
-            available_tee_time_objs = [
-                datetime.strptime(tt, "%Y-%m-%dT%H:%M:%S").time()
-                for tt in available_tee_times
-            ]
         gone_matches = MatchingTeeTime.objects.filter(
             user_request=user_request,
             course_schedule=schedule,
             date=date,
             status=MatchingTeeTime.Status.AVAILABLE,
-        ).exclude(time__in=available_tee_time_objs)
+        ).exclude(time__in=available_tee_times)
         for match in gone_matches:
             # save each object individually instead of .update(..) to trigger post_save receiver for notifications
             match.status = MatchingTeeTime.Status.GONE

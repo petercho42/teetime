@@ -189,6 +189,7 @@ class Command(BaseCommand):
                 f"Created CourseSchedule {harbor_links_championship_course.name}"
             )
         )
+        """
         harbor_links_champcourse_back_9 = CourseSchedule.objects.create(
             course=harbor_links,
             name="Harbor Links ChampCourse Back Nine",
@@ -211,6 +212,7 @@ class Command(BaseCommand):
                 f"Created CourseSchedule {harbor_links_executive_course.name}"
             )
         )
+        """
 
         """
         Create UserTeeTimeRequest
@@ -297,7 +299,7 @@ class Command(BaseCommand):
             course=harbor_links,
             date=date(2023, 8, 26),
             tee_time_min=time(12, 00),
-            tee_time_max=time(15, 00),
+            tee_time_max=time(14, 40),
             players=UserTeeTimeRequest.Players.FOUR,
             status=UserTeeTimeRequest.Status.ACTIVE,
         )

@@ -80,51 +80,40 @@ class Search:
     def __check_for_goibsvision_tee_times(session, request_obj):
         for target_date in request_obj.target_dates:
             if request_obj.search_time(target_date):
-                form_data = {
-                    "CriteriaDate": target_date.strftime("%-m/%-d/%Y"),
-                    "date": target_date.strftime("%-m/%-d/%Y"),
-                    "CriteriaTime": "10:00 AM",
-                    "NumberOfPlayers": request_obj.players,
-                    "Holes": "18",
-                    "Criteria.Facilities.Count": "3",
-                    "X-Requested-With": "XMLHttpRequest",
-                }
-                for index, schedule in enumerate(
-                    request_obj.course.courseschedule_set.all()
-                ):
-                    if index == 0:
-                        form_data[f"Facilities[{index}].IsChecked"] = "true"
-                    else:
-                        form_data[f"Facilities[{index}].IsChecked"] = "false"
-                    facility_info = {
-                        f"Facilities[{index}].FacilityID": schedule.facility_id,
-                        f"Facilities[{index}].ConsoleFacilityID": schedule.console_facility_id,
+                for schedule in request_obj.course.courseschedule_set.all():
+                    form_data = {
+                        "CriteriaDate": target_date.strftime("%-m/%-d/%Y"),
+                        "date": target_date.strftime("%-m/%-d/%Y"),
+                        "CriteriaTime": "10:00 AM",
+                        "NumberOfPlayers": request_obj.players,
+                        "Holes": "18",
+                        "Criteria.Facilities.Count": "1",
+                        "Facilities[0].IsChecked": "true",
+                        "Facilities[0].FacilityID": schedule.facility_id,
+                        "Facilities[0].ConsoleFacilityID": schedule.console_facility_id,
                         "Facilities[0].IsFavorite": "False",
+                        "X-Requested-With": "XMLHttpRequest",
                     }
-                    form_data = {**form_data, **facility_info}
 
-                print(
-                    f"Searching for {schedule.name} teetime ({target_date.strftime('%A %m-%d-%Y')})"
-                )
-
-                try:
-                    response = session.post(
-                        Search.GOIBSVISION_BROWSE_API, data=form_data
+                    print(
+                        f"Searching for {schedule.name} teetime ({target_date.strftime('%A %m-%d-%Y')})"
                     )
 
-                    if response.status_code == 200:
-                        api_data = parse_goibsvision_html(
-                            response.content.decode("utf-8")
+                    try:
+                        response = session.post(
+                            Search.GOIBSVISION_BROWSE_API, data=form_data
                         )
-                        print(api_data)
-                        break
 
-                        available_tee_times = []  # need for closing old teetimes
-                        for tee_time in api_data:
-                            if tee_time["available"]:
+                        if response.status_code == 200:
+                            api_data = parse_goibsvision_html(
+                                response.content.decode("utf-8")
+                            )
+
+                            available_tee_times = []  # need for closing old teetimes
+                            for tee_time in api_data:
                                 time_obj = datetime.strptime(
-                                    tee_time["teeTime"], "%Y-%m-%dT%H:%M:%S"
-                                ).time()  # 2023-08-10T12:03:00
+                                    tee_time["time"], "%I:%M %p"
+                                ).time()  # 3:50 PM
                                 if (
                                     request_obj.tee_time_min
                                     and time_obj <= request_obj.tee_time_min
@@ -138,21 +127,21 @@ class Search:
                                 MatchingTeeTime.update_or_create_instance(
                                     request_obj, schedule, tee_time
                                 )
-                                available_tee_times.append(tee_time["teeTime"])
-                        MatchingTeeTime.process_gone_matching_tee_times(
-                            request_obj, schedule, target_date, available_tee_times
-                        )
-                    else:
-                        print("Request Headers:")
-                        for key, value in response.request.headers.items():
-                            print(f"{key}: {value}")
-                        print(
-                            f"Failed to fetch data from the API: {response.status_code} : {response.text}"
-                        )
-                except requests.exceptions.RequestException as e:
-                    # Handle exceptions such as network errors
-                    print("Error while making API request:", e)
-                    time.sleep(2)
+                                available_tee_times.append(time_obj)
+                            MatchingTeeTime.process_gone_matching_tee_times(
+                                request_obj, schedule, target_date, available_tee_times
+                            )
+                        else:
+                            print("Request Headers:")
+                            for key, value in response.request.headers.items():
+                                print(f"{key}: {value}")
+                            print(
+                                f"Failed to fetch data from the API: {response.status_code} : {response.text}"
+                            )
+                    except requests.exceptions.RequestException as e:
+                        # Handle exceptions such as network errors
+                        print("Error while making API request:", e)
+                        time.sleep(2)
             else:
                 time.sleep(1)
         random_sleep_duration = random.randint(1, 60)
@@ -209,7 +198,7 @@ class Search:
                                     MatchingTeeTime.update_or_create_instance(
                                         request_obj, schedule, tee_time
                                     )
-                                    available_tee_times.append(tee_time["teeTime"])
+                                    available_tee_times.append(time_obj)
                             MatchingTeeTime.process_gone_matching_tee_times(
                                 request_obj, schedule, target_date, available_tee_times
                             )
@@ -308,7 +297,7 @@ class Search:
                                     MatchingTeeTime.update_or_create_instance(
                                         request_obj, schedule, tee_time
                                     )
-                                    available_tee_times.append(tee_time["time"])
+                                    available_tee_times.append(time_obj)
                                     refresh_left = 5  # refresh pending reservation 5 times, 15 seconds each.
                                     while refresh_left > 0:
                                         print("Sleeping for 15 seconds")
