@@ -4,7 +4,7 @@ from datetime import date, datetime, timedelta
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import Q
-from django.db.models.signals import post_save
+from django.db.models.signals import m2m_changed, post_save
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 
@@ -82,6 +82,7 @@ class UserTeeTimeRequest(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     course = models.ForeignKey(Course, on_delete=models.PROTECT)
+    course_schedules = models.ManyToManyField(CourseSchedule, blank=True)
     date = models.DateField(default=None, null=True, blank=True)
 
     class DaysChoices(models.TextChoices):
@@ -260,6 +261,26 @@ class UserTeeTimeRequest(models.Model):
                 return datetime_helper.get_next_dates("every_friday")
             else:
                 raise Exception("TeeTime request is missing target dates!")
+
+
+@receiver(m2m_changed, sender=UserTeeTimeRequest.course_schedules.through)
+def authors_changed(sender, instance, action, reverse, model, pk_set, **kwargs):
+    if action == "post_add":
+        added_schedules = CourseSchedule.objects.filter(pk__in=pk_set)
+        print(
+            f"Schedules add to Request ID {instance.id} ({instance.course.name}): {', '.join(schedule.name for schedule in added_schedules)}"
+        )
+        wrong_schedules = added_schedules.exclude(course=instance.course)
+        if wrong_schedules:
+            print(
+                f"These schedules does not belong to {instance.course.name} (Request ID {instance.id}): {', '.join(schedule.name for schedule in wrong_schedules)}"
+            )
+        instance.course_schedules.remove(*wrong_schedules)
+    elif action == "post_remove":
+        removed_schedules = CourseSchedule.objects.filter(pk__in=pk_set)
+        print(
+            f"Schedules removed from Request ID {instance.id} ({instance.course.name}): {', '.join(schedule.name for schedule in removed_schedules)}"
+        )
 
 
 class MatchingTeeTime(models.Model):

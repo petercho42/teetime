@@ -7,8 +7,15 @@ import time
 
 from datetime import datetime, time as datetime_time
 
+from django.db.models import Prefetch
+
 from teetimebot.goibsvision_helper import parse_goibsvision_html
-from teetimebot.models import Course, MatchingTeeTime, UserTeeTimeRequest
+from teetimebot.models import (
+    Course,
+    CourseSchedule,
+    MatchingTeeTime,
+    UserTeeTimeRequest,
+)
 
 
 class Search:
@@ -34,7 +41,10 @@ class Search:
         while True:
             user_requests = (
                 UserTeeTimeRequest.objects.select_related("course")
-                .prefetch_related("course__courseschedule_set", "user__foreupuser_set")
+                .prefetch_related(
+                    Prefetch("course_schedules", queryset=CourseSchedule.objects.all()),
+                    "user__foreupuser_set",
+                )
                 .filter(
                     status=UserTeeTimeRequest.Status.ACTIVE,
                     course__booking_vendor=vendor,
@@ -80,7 +90,7 @@ class Search:
     def __check_for_goibsvision_tee_times(session, request_obj):
         for target_date in request_obj.target_dates:
             if request_obj.search_time(target_date):
-                for schedule in request_obj.course.courseschedule_set.all():
+                for schedule in request_obj.course_schedules.all():
                     form_data = {
                         "CriteriaDate": target_date.strftime("%-m/%-d/%Y"),
                         "date": target_date.strftime("%-m/%-d/%Y"),
@@ -153,7 +163,7 @@ class Search:
     def __check_for_teeoff_tee_times(session, request_obj):
         for target_date in request_obj.target_dates:
             if request_obj.search_time(target_date):
-                for schedule in request_obj.course.courseschedule_set.all():
+                for schedule in request_obj.course_schedules.all():
                     data = {
                         "FacilityId": str(schedule.schedule_id),
                         "PageSize": 100,
@@ -224,7 +234,7 @@ class Search:
     def __check_for_foreup_tee_times(session, request_obj):
         for target_date in request_obj.target_dates:
             if request_obj.search_time(target_date):
-                for schedule in request_obj.course.courseschedule_set.all():
+                for schedule in request_obj.course_schedules.all():
                     print(
                         f"Searching for {schedule.name} teetime ({target_date.strftime('%A %m-%d-%Y')})"
                     )
