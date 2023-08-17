@@ -226,7 +226,7 @@ class Command(BaseCommand):
             tee_time_max=time(8, 15),
             search_time_min=time(5, 00),
             search_time_max=time(21, 00),
-            players=UserTeeTimeRequest.Players.ANY,
+            players=UserTeeTimeRequest.Players.FOUR,
             holes=UserTeeTimeRequest.Holes.ANY,
             status=UserTeeTimeRequest.Status.ACTIVE,
         )
@@ -260,7 +260,6 @@ class Command(BaseCommand):
             search_time_min=time(5, 00),
             search_time_max=time(20, 00),
             search_day=UserTeeTimeRequest.SearchDayChoices.EVERY_DAY,
-            players=UserTeeTimeRequest.Players.FOUR,
             holes=UserTeeTimeRequest.Holes.ANY,
             status=UserTeeTimeRequest.Status.INACTIVE,
         )
@@ -275,7 +274,7 @@ class Command(BaseCommand):
             search_time_min=time(5, 00),
             search_time_max=time(13, 00),
             search_day=UserTeeTimeRequest.SearchDayChoices.WEEKDAYS,
-            status=UserTeeTimeRequest.Status.INACTIVE,
+            status=UserTeeTimeRequest.Status.ACTIVE,
         )
         self.stdout.write(
             self.style.SUCCESS(f"Created UserTeeTimeRequest {user_request.id}")
@@ -288,7 +287,7 @@ class Command(BaseCommand):
             search_time_min=time(5, 00),
             search_time_max=time(13, 00),
             search_day=UserTeeTimeRequest.SearchDayChoices.WEEKDAYS,
-            status=UserTeeTimeRequest.Status.INACTIVE,
+            status=UserTeeTimeRequest.Status.ACTIVE,
         )
         self.stdout.write(
             self.style.SUCCESS(f"Created UserTeeTimeRequest {user_request.id}")
