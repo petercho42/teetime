@@ -67,7 +67,7 @@ class Command(BaseCommand):
 
         foreup_u = ForeUpUser.objects.create(
             user=u,
-            username="phcho83@gmail.com",
+            username="monkeydluffy1p1p@gmail.com",
             password="",  # real password required
             course_id=19765,
             booking_class=2144,
