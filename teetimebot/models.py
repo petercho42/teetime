@@ -416,7 +416,7 @@ def create_match_notification(sender, instance, created, **kwargs):
     ):
         if instance.status == MatchingTeeTime.Status.AVAILABLE:
             subject = f'{instance.date.strftime("%A %m/%d/%y")}: {instance.course_schedule.name} @{instance.time.strftime("%I:%M %p")} for {instance.available_spots} ${instance.price}.'
-            body = f'{subject}\nFound at {instance.updated_at.strftime("%I:%M:%S %p")}\n{instance.course_schedule.schedule_url}'
+            body = f'{subject}\nFound at {instance.created_at.strftime("%I:%M:%S %p")}\n{instance.course_schedule.schedule_url}'
             if reemerged:
                 subject = f"[Reemerged]{subject}"
             if price_change:
