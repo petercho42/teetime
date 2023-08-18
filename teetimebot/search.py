@@ -308,7 +308,7 @@ class Search:
                                         request_obj, schedule, tee_time
                                     )
                                     available_tee_times.append(time_obj)
-                                    refresh_left = 5  # refresh pending reservation 5 times, 15 seconds each.
+                                    refresh_left = 4  # refresh pending reservation 4 times, 15 seconds each.
                                     while refresh_left > 0:
                                         print("Sleeping for 15 seconds")
                                         time.sleep(15)
