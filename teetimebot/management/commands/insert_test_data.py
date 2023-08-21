@@ -228,7 +228,7 @@ class Command(BaseCommand):
             search_time_max=time(21, 00),
             players=UserTeeTimeRequest.Players.FOUR,
             holes=UserTeeTimeRequest.Holes.ANY,
-            status=UserTeeTimeRequest.Status.ACTIVE,
+            status=UserTeeTimeRequest.Status.INACTIVE,
         )
         self.stdout.write(
             self.style.SUCCESS(f"Created UserTeeTimeRequest {user_request.id}")
@@ -327,7 +327,7 @@ class Command(BaseCommand):
             course=harbor_links,
             date=date(2023, 8, 26),
             tee_time_min=time(12, 00),
-            tee_time_max=time(14, 40),
+            tee_time_max=time(13, 40),
             players=UserTeeTimeRequest.Players.FOUR,
             status=UserTeeTimeRequest.Status.ACTIVE,
         )
