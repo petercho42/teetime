@@ -225,7 +225,7 @@ class Search:
                         time.sleep(2)
             else:
                 time.sleep(1)
-        random_sleep_duration = random.randint(1, 60)
+        random_sleep_duration = random.randint(1, 40)
         # Sleep for the random duration
         print(f"Sleeping for {random_sleep_duration} seconds")
         time.sleep(random_sleep_duration)

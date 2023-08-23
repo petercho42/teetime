@@ -170,6 +170,22 @@ class Command(BaseCommand):
         )
 
         """
+        Create Forest Park
+        """
+        forest_park = Course.objects.create(
+            name="Forest Park Golf Course",
+            booking_vendor=Course.BookingVendor.TEEOFF,
+        )
+        self.stdout.write(self.style.SUCCESS(f"Created Course {forest_park.name}"))
+
+        forest_park_eighteen = CourseSchedule.objects.create(
+            course=forest_park, name="Forest Park Golf Course 18 Hole", schedule_id=5045
+        )
+        self.stdout.write(
+            self.style.SUCCESS(f"Created CourseSchedule {forest_park_eighteen.name}")
+        )
+
+        """
         Create Harbor Links Course
         """
         harbor_links = Course.objects.create(
@@ -321,6 +337,20 @@ class Command(BaseCommand):
             self.style.SUCCESS(f"Created UserTeeTimeRequest {user_request.id}")
         )
         user_request.course_schedules.set([kissena_eighteen])
+
+        user_request = UserTeeTimeRequest.objects.create(
+            user=u,
+            course=forest_park,
+            days=UserTeeTimeRequest.DaysChoices.TODAY,
+            search_time_min=time(5, 00),
+            search_time_max=time(13, 00),
+            search_day=UserTeeTimeRequest.SearchDayChoices.WEEKDAYS,
+            status=UserTeeTimeRequest.Status.ACTIVE,
+        )
+        self.stdout.write(
+            self.style.SUCCESS(f"Created UserTeeTimeRequest {user_request.id}")
+        )
+        user_request.course_schedules.set([forest_park_eighteen])
 
         user_request = UserTeeTimeRequest.objects.create(
             user=u,
