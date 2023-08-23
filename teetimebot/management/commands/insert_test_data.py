@@ -313,9 +313,10 @@ class Command(BaseCommand):
         user_request = UserTeeTimeRequest.objects.create(
             user=u,
             course=douglaston,
-            days=UserTeeTimeRequest.DaysChoices.TODAY,
+            # days=UserTeeTimeRequest.DaysChoices.TODAY,
+            date=date(2023, 8, 24),
             search_time_min=time(5, 00),
-            search_time_max=time(13, 00),
+            search_time_max=time(23, 00),
             search_day=UserTeeTimeRequest.SearchDayChoices.WEEKDAYS,
             status=UserTeeTimeRequest.Status.ACTIVE,
         )
@@ -327,9 +328,10 @@ class Command(BaseCommand):
         user_request = UserTeeTimeRequest.objects.create(
             user=u,
             course=kissena,
-            days=UserTeeTimeRequest.DaysChoices.TODAY,
+            # days=UserTeeTimeRequest.DaysChoices.TODAY,
+            date=date(2023, 8, 24),
             search_time_min=time(5, 00),
-            search_time_max=time(13, 00),
+            search_time_max=time(23, 00),
             search_day=UserTeeTimeRequest.SearchDayChoices.WEEKDAYS,
             status=UserTeeTimeRequest.Status.ACTIVE,
         )
@@ -341,9 +343,10 @@ class Command(BaseCommand):
         user_request = UserTeeTimeRequest.objects.create(
             user=u,
             course=forest_park,
-            days=UserTeeTimeRequest.DaysChoices.TODAY,
+            # days=UserTeeTimeRequest.DaysChoices.TODAY,
+            date=date(2023, 8, 24),
             search_time_min=time(5, 00),
-            search_time_max=time(13, 00),
+            search_time_max=time(23, 00),
             search_day=UserTeeTimeRequest.SearchDayChoices.WEEKDAYS,
             status=UserTeeTimeRequest.Status.ACTIVE,
         )
