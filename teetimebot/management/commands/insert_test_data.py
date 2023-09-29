@@ -284,9 +284,9 @@ class Command(BaseCommand):
         user_request = UserTeeTimeRequest.objects.create(
             user=u,
             course=harbor_links,
-            date=date(2023, 9, 16),
-            tee_time_min=time(12, 00),
-            tee_time_max=time(14, 00),
+            date=date(2023, 10, 14),
+            tee_time_min=time(11, 59),
+            tee_time_max=time(13, 42),
             search_time_min=time(5, 00),
             search_time_max=time(22, 00),
             players=UserTeeTimeRequest.Players.FOUR,
