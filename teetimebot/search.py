@@ -363,8 +363,7 @@ class Search:
                     else:
                     """
                     # randomly sleep for 1-5 seconds to avoid getting rate limited
-                    random_float = random.uniform(1, 5)
-                    time.sleep(1.0)
+                    time.sleep(random.uniform(1, 5))
 
             else:
                 time.sleep(1)
