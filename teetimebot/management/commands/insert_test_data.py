@@ -186,6 +186,24 @@ class Command(BaseCommand):
         )
 
         """
+        Create Willow Creek Golf & Country Club
+        """
+        willow_creek = Course.objects.create(
+            name="Willow Creek Golf & Country Club",
+            booking_vendor=Course.BookingVendor.TEEOFF,
+        )
+        self.stdout.write(self.style.SUCCESS(f"Created Course {willow_creek.name}"))
+
+        willow_creek_eighteen = CourseSchedule.objects.create(
+            course=willow_creek,
+            name="Create Willow Creek Golf & Country Club 18 Hole",
+            schedule_id=4749,
+        )
+        self.stdout.write(
+            self.style.SUCCESS(f"Created CourseSchedule {willow_creek_eighteen.name}")
+        )
+
+        """
         Create Harbor Links Course
         """
         harbor_links = Course.objects.create(
@@ -259,7 +277,7 @@ class Command(BaseCommand):
             search_time_min=time(5, 00),
             search_time_max=time(23, 00),
             search_day=UserTeeTimeRequest.SearchDayChoices.WEEKDAYS,
-            status=UserTeeTimeRequest.Status.ACTIVE,
+            status=UserTeeTimeRequest.Status.INACTIVE,
         )
         self.stdout.write(
             self.style.SUCCESS(f"Created UserTeeTimeRequest {user_request.id}")
@@ -274,7 +292,7 @@ class Command(BaseCommand):
             search_time_min=time(5, 00),
             search_time_max=time(23, 00),
             search_day=UserTeeTimeRequest.SearchDayChoices.WEEKDAYS,
-            status=UserTeeTimeRequest.Status.ACTIVE,
+            status=UserTeeTimeRequest.Status.INACTIVE,
         )
         self.stdout.write(
             self.style.SUCCESS(f"Created UserTeeTimeRequest {user_request.id}")
@@ -283,26 +301,23 @@ class Command(BaseCommand):
 
         user_request = UserTeeTimeRequest.objects.create(
             user=u,
-            course=harbor_links,
+            course=willow_creek,
             date=date(2023, 10, 14),
-            tee_time_min=time(11, 59),
-            tee_time_max=time(13, 42),
             search_time_min=time(5, 00),
             search_time_max=time(23, 00),
-            players=UserTeeTimeRequest.Players.FOUR,
             status=UserTeeTimeRequest.Status.ACTIVE,
         )
         self.stdout.write(
             self.style.SUCCESS(f"Created UserTeeTimeRequest {user_request.id}")
         )
-        user_request.course_schedules.set([harbor_links_championship_course])
+        user_request.course_schedules.set([willow_creek_eighteen])
 
         user_request = UserTeeTimeRequest.objects.create(
             user=u,
             course=harbor_links,
-            date=date(2023, 10, 6),
-            tee_time_min=time(9, 59),
-            tee_time_max=time(12, 59),
+            date=date(2023, 10, 14),
+            tee_time_min=time(11, 59),
+            tee_time_max=time(13, 51),
             search_time_min=time(5, 00),
             search_time_max=time(23, 00),
             players=UserTeeTimeRequest.Players.FOUR,
