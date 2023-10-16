@@ -301,19 +301,6 @@ class Command(BaseCommand):
 
         user_request = UserTeeTimeRequest.objects.create(
             user=u,
-            course=willow_creek,
-            date=date(2023, 10, 14),
-            search_time_min=time(5, 00),
-            search_time_max=time(23, 00),
-            status=UserTeeTimeRequest.Status.ACTIVE,
-        )
-        self.stdout.write(
-            self.style.SUCCESS(f"Created UserTeeTimeRequest {user_request.id}")
-        )
-        user_request.course_schedules.set([willow_creek_eighteen])
-
-        user_request = UserTeeTimeRequest.objects.create(
-            user=u,
             course=harbor_links,
             date=date(2023, 10, 14),
             tee_time_min=time(11, 59),
@@ -327,3 +314,87 @@ class Command(BaseCommand):
             self.style.SUCCESS(f"Created UserTeeTimeRequest {user_request.id}")
         )
         user_request.course_schedules.set([harbor_links_championship_course])
+
+        user_request = UserTeeTimeRequest.objects.create(
+            user=u,
+            course=douglaston,
+            date=date(2023, 10, 17),
+            tee_time_max=time(12, 31),
+            search_time_min=time(5, 00),
+            search_time_max=time(23, 00),
+            status=UserTeeTimeRequest.Status.ACTIVE,
+        )
+        self.stdout.write(
+            self.style.SUCCESS(f"Created UserTeeTimeRequest {user_request.id}")
+        )
+        user_request.course_schedules.set([douglaston_eighteen])
+
+        user_request = UserTeeTimeRequest.objects.create(
+            user=u,
+            course=douglaston,
+            date=date(2023, 10, 18),
+            tee_time_max=time(12, 31),
+            search_time_min=time(5, 00),
+            search_time_max=time(23, 00),
+            status=UserTeeTimeRequest.Status.ACTIVE,
+        )
+        self.stdout.write(
+            self.style.SUCCESS(f"Created UserTeeTimeRequest {user_request.id}")
+        )
+        user_request.course_schedules.set([douglaston_eighteen])
+
+        user_request = UserTeeTimeRequest.objects.create(
+            user=u,
+            course=douglaston,
+            date=date(2023, 10, 19),
+            tee_time_max=time(12, 31),
+            search_time_min=time(5, 00),
+            search_time_max=time(23, 00),
+            status=UserTeeTimeRequest.Status.ACTIVE,
+        )
+        self.stdout.write(
+            self.style.SUCCESS(f"Created UserTeeTimeRequest {user_request.id}")
+        )
+        user_request.course_schedules.set([douglaston_eighteen])
+
+        user_request = UserTeeTimeRequest.objects.create(
+            user=u,
+            course=kissena,
+            date=date(2023, 10, 17),
+            tee_time_max=time(12, 31),
+            search_time_min=time(5, 00),
+            search_time_max=time(23, 00),
+            status=UserTeeTimeRequest.Status.ACTIVE,
+        )
+        self.stdout.write(
+            self.style.SUCCESS(f"Created UserTeeTimeRequest {user_request.id}")
+        )
+        user_request.course_schedules.set([kissena_eighteen])
+
+        user_request = UserTeeTimeRequest.objects.create(
+            user=u,
+            course=kissena,
+            date=date(2023, 10, 18),
+            tee_time_max=time(12, 31),
+            search_time_min=time(5, 00),
+            search_time_max=time(23, 00),
+            status=UserTeeTimeRequest.Status.ACTIVE,
+        )
+        self.stdout.write(
+            self.style.SUCCESS(f"Created UserTeeTimeRequest {user_request.id}")
+        )
+        user_request.course_schedules.set([kissena_eighteen])
+
+        user_request = UserTeeTimeRequest.objects.create(
+            user=u,
+            course=kissena,
+            date=date(2023, 10, 19),
+            tee_time_max=time(12, 31),
+            search_time_min=time(5, 00),
+            search_time_max=time(23, 00),
+            status=UserTeeTimeRequest.Status.ACTIVE,
+        )
+        self.stdout.write(
+            self.style.SUCCESS(f"Created UserTeeTimeRequest {user_request.id}")
+        )
+        user_request.course_schedules.set([kissena_eighteen])
