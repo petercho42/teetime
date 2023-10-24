@@ -318,10 +318,9 @@ class Command(BaseCommand):
         user_request = UserTeeTimeRequest.objects.create(
             user=u,
             course=douglaston,
-            date=date(2023, 10, 17),
+            date=date(2023, 10, 31),
             tee_time_max=time(12, 31),
-            search_time_min=time(5, 00),
-            search_time_max=time(23, 00),
+            group_id="weekday_deals",
             status=UserTeeTimeRequest.Status.ACTIVE,
         )
         self.stdout.write(
@@ -332,10 +331,9 @@ class Command(BaseCommand):
         user_request = UserTeeTimeRequest.objects.create(
             user=u,
             course=douglaston,
-            date=date(2023, 10, 18),
+            date=date(2023, 11, 1),
             tee_time_max=time(12, 31),
-            search_time_min=time(5, 00),
-            search_time_max=time(23, 00),
+            group_id="weekday_deals",
             status=UserTeeTimeRequest.Status.ACTIVE,
         )
         self.stdout.write(
@@ -346,10 +344,9 @@ class Command(BaseCommand):
         user_request = UserTeeTimeRequest.objects.create(
             user=u,
             course=douglaston,
-            date=date(2023, 10, 19),
+            date=date(2023, 11, 2),
             tee_time_max=time(12, 31),
-            search_time_min=time(5, 00),
-            search_time_max=time(23, 00),
+            group_id="weekday_deals",
             status=UserTeeTimeRequest.Status.ACTIVE,
         )
         self.stdout.write(
@@ -360,10 +357,9 @@ class Command(BaseCommand):
         user_request = UserTeeTimeRequest.objects.create(
             user=u,
             course=kissena,
-            date=date(2023, 10, 17),
+            date=date(2023, 10, 31),
             tee_time_max=time(12, 31),
-            search_time_min=time(5, 00),
-            search_time_max=time(23, 00),
+            group_id="weekday_deals",
             status=UserTeeTimeRequest.Status.ACTIVE,
         )
         self.stdout.write(
@@ -374,10 +370,9 @@ class Command(BaseCommand):
         user_request = UserTeeTimeRequest.objects.create(
             user=u,
             course=kissena,
-            date=date(2023, 10, 18),
+            date=date(2023, 11, 1),
             tee_time_max=time(12, 31),
-            search_time_min=time(5, 00),
-            search_time_max=time(23, 00),
+            group_id="weekday_deals",
             status=UserTeeTimeRequest.Status.ACTIVE,
         )
         self.stdout.write(
@@ -388,10 +383,9 @@ class Command(BaseCommand):
         user_request = UserTeeTimeRequest.objects.create(
             user=u,
             course=kissena,
-            date=date(2023, 10, 19),
+            date=date(2023, 11, 2),
             tee_time_max=time(12, 31),
-            search_time_min=time(5, 00),
-            search_time_max=time(23, 00),
+            group_id="weekday_deals",
             status=UserTeeTimeRequest.Status.ACTIVE,
         )
         self.stdout.write(

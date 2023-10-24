@@ -158,6 +158,13 @@ class UserTeeTimeRequest(models.Model):
         default=Status.INACTIVE,
     )
 
+    group_id = models.CharField(
+        max_length=20,
+        default=None,
+        null=True,
+        blank=True,
+    )
+
     def update_status_if_expired(self):
         if self.date is not None:
             if date.today() > self.date:
@@ -429,6 +436,29 @@ def create_match_notification(sender, instance, created, **kwargs):
             subject = f'[Gone]{instance.date.strftime("%A %m/%d/%y")}: {instance.course_schedule.name} @{instance.time.strftime("%I:%M %p")} ${instance.price}.'
             body = f'{subject}\nFound at {instance.created_at.strftime("%I:%M:%S %p")}\nGone at {instance.updated_at.strftime("%I:%M:%S %p")}'
         print(subject)
+
+        if instance.user_request.group_id:
+            same_group_id_requests = UserTeeTimeRequest.objects.filter(
+                status=UserTeeTimeRequest.Status.ACTIVE,
+                group_id=instance.user_request.group_id,
+            ).values_list("id", flat=True)
+
+            matching_group_tee_times = MatchingTeeTime.objects.filter(
+                user_request_id__in=same_group_id_requests,
+            ).order_by("course_schedule_id", "date", "time")
+
+            if matching_group_tee_times:
+                matching_group_text = (
+                    f"\n\nUserRequest Group: {instance.user_request.group_id}\n"
+                )
+                for tt in matching_group_tee_times:
+                    matching_group_text += f"[{tt.status}] {tt.date.strftime('%A %m/%d/%y')}: {tt.course_schedule.name} @{tt.time.strftime('%I:%M %p')} for {tt.available_spots} ${tt.price}"
+                    if tt.id == instance.id:
+                        matching_group_text += " (this)"
+                    matching_group_text += "\n"
+
+                body += matching_group_text
+
         if instance.user_request.user.notifications.text:
             MatchingTeeTimeNotification.objects.create(
                 matching_tee_time=instance,

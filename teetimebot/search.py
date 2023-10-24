@@ -30,6 +30,9 @@ class Search:
     MY_FOREUP_PASSWORD = os.getenv("MY_FOREUP_PASSWORD")
 
     TEEOFF_HOT_DEALS_API = "https://www.teeoff.com/api/tee-times/hot-deals-zone"  # POST
+    GOLFNOW_HOT_DEALS_API = (
+        "https://www.golfnow.com/api/tee-times/hot-deals-zone"  # POST
+    )
 
     GOIBSVISION_BROWSE_API = (
         "https://www.goibsvision.com/WebRes/Club/harborlinks/BrowseTeeTimes"  # POST
@@ -184,7 +187,7 @@ class Search:
                     custom_user_agent = "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Mobile Safari/537.36"
                     session.headers.update({"User-Agent": custom_user_agent})
                     try:
-                        response = session.post(Search.TEEOFF_HOT_DEALS_API, data=data)
+                        response = session.post(Search.GOLFNOW_HOT_DEALS_API, data=data)
 
                         if response.status_code == 200:
                             api_data = response.json()
