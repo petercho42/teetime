@@ -318,19 +318,6 @@ class Command(BaseCommand):
         user_request = UserTeeTimeRequest.objects.create(
             user=u,
             course=douglaston,
-            date=date(2023, 10, 31),
-            tee_time_max=time(12, 31),
-            group_id="weekday_deals",
-            status=UserTeeTimeRequest.Status.ACTIVE,
-        )
-        self.stdout.write(
-            self.style.SUCCESS(f"Created UserTeeTimeRequest {user_request.id}")
-        )
-        user_request.course_schedules.set([douglaston_eighteen])
-
-        user_request = UserTeeTimeRequest.objects.create(
-            user=u,
-            course=douglaston,
             date=date(2023, 11, 1),
             tee_time_max=time(12, 31),
             group_id="weekday_deals",
@@ -356,8 +343,8 @@ class Command(BaseCommand):
 
         user_request = UserTeeTimeRequest.objects.create(
             user=u,
-            course=kissena,
-            date=date(2023, 10, 31),
+            course=douglaston,
+            date=date(2023, 11, 3),
             tee_time_max=time(12, 31),
             group_id="weekday_deals",
             status=UserTeeTimeRequest.Status.ACTIVE,
@@ -365,7 +352,7 @@ class Command(BaseCommand):
         self.stdout.write(
             self.style.SUCCESS(f"Created UserTeeTimeRequest {user_request.id}")
         )
-        user_request.course_schedules.set([kissena_eighteen])
+        user_request.course_schedules.set([douglaston_eighteen])
 
         user_request = UserTeeTimeRequest.objects.create(
             user=u,
@@ -384,6 +371,19 @@ class Command(BaseCommand):
             user=u,
             course=kissena,
             date=date(2023, 11, 2),
+            tee_time_max=time(12, 31),
+            group_id="weekday_deals",
+            status=UserTeeTimeRequest.Status.ACTIVE,
+        )
+        self.stdout.write(
+            self.style.SUCCESS(f"Created UserTeeTimeRequest {user_request.id}")
+        )
+        user_request.course_schedules.set([kissena_eighteen])
+
+        user_request = UserTeeTimeRequest.objects.create(
+            user=u,
+            course=kissena,
+            date=date(2023, 11, 3),
             tee_time_max=time(12, 31),
             group_id="weekday_deals",
             status=UserTeeTimeRequest.Status.ACTIVE,
