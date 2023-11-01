@@ -214,7 +214,7 @@ class Command(BaseCommand):
 
         west_point_eighteen = CourseSchedule.objects.create(
             course=west_point,
-            name="Create West Point Golf Course",
+            name="West Point Golf Course 18 Hole",
             schedule_id=6013,
         )
         self.stdout.write(
