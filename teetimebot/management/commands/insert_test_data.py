@@ -204,6 +204,24 @@ class Command(BaseCommand):
         )
 
         """
+        Create West Point Golf Course
+        """
+        west_point = Course.objects.create(
+            name="West Point Golf Course",
+            booking_vendor=Course.BookingVendor.TEEOFF,
+        )
+        self.stdout.write(self.style.SUCCESS(f"Created Course {west_point.name}"))
+
+        west_point_eighteen = CourseSchedule.objects.create(
+            course=west_point,
+            name="Create West Point Golf Course",
+            schedule_id=6013,
+        )
+        self.stdout.write(
+            self.style.SUCCESS(f"Created CourseSchedule {west_point_eighteen.name}")
+        )
+
+        """
         Create Harbor Links Course
         """
         harbor_links = Course.objects.create(
@@ -246,11 +264,6 @@ class Command(BaseCommand):
                 f"Created CourseSchedule {harbor_links_executive_course.name}"
             )
         )
-        """
-
-        """
-        Create UserTeeTimeRequest
-        """
 
         user_request = UserTeeTimeRequest.objects.create(
             user=u,
@@ -315,10 +328,16 @@ class Command(BaseCommand):
         )
         user_request.course_schedules.set([harbor_links_championship_course])
 
+        """
+
+        """
+        Create UserTeeTimeRequest
+        """
+
         user_request = UserTeeTimeRequest.objects.create(
             user=u,
             course=douglaston,
-            date=date(2023, 11, 1),
+            date=date(2023, 11, 8),
             tee_time_max=time(12, 31),
             group_id="weekday_deals",
             status=UserTeeTimeRequest.Status.ACTIVE,
@@ -331,20 +350,7 @@ class Command(BaseCommand):
         user_request = UserTeeTimeRequest.objects.create(
             user=u,
             course=douglaston,
-            date=date(2023, 11, 2),
-            tee_time_max=time(12, 31),
-            group_id="weekday_deals",
-            status=UserTeeTimeRequest.Status.ACTIVE,
-        )
-        self.stdout.write(
-            self.style.SUCCESS(f"Created UserTeeTimeRequest {user_request.id}")
-        )
-        user_request.course_schedules.set([douglaston_eighteen])
-
-        user_request = UserTeeTimeRequest.objects.create(
-            user=u,
-            course=douglaston,
-            date=date(2023, 11, 3),
+            date=date(2023, 11, 9),
             tee_time_max=time(12, 31),
             group_id="weekday_deals",
             status=UserTeeTimeRequest.Status.ACTIVE,
@@ -357,7 +363,7 @@ class Command(BaseCommand):
         user_request = UserTeeTimeRequest.objects.create(
             user=u,
             course=kissena,
-            date=date(2023, 11, 1),
+            date=date(2023, 11, 8),
             tee_time_max=time(12, 31),
             group_id="weekday_deals",
             status=UserTeeTimeRequest.Status.ACTIVE,
@@ -370,7 +376,7 @@ class Command(BaseCommand):
         user_request = UserTeeTimeRequest.objects.create(
             user=u,
             course=kissena,
-            date=date(2023, 11, 2),
+            date=date(2023, 11, 9),
             tee_time_max=time(12, 31),
             group_id="weekday_deals",
             status=UserTeeTimeRequest.Status.ACTIVE,
@@ -382,13 +388,11 @@ class Command(BaseCommand):
 
         user_request = UserTeeTimeRequest.objects.create(
             user=u,
-            course=kissena,
-            date=date(2023, 11, 3),
-            tee_time_max=time(12, 31),
-            group_id="weekday_deals",
+            course=west_point,
+            date=date(2023, 11, 11),
             status=UserTeeTimeRequest.Status.ACTIVE,
         )
         self.stdout.write(
             self.style.SUCCESS(f"Created UserTeeTimeRequest {user_request.id}")
         )
-        user_request.course_schedules.set([kissena_eighteen])
+        user_request.course_schedules.set([west_point_eighteen])
