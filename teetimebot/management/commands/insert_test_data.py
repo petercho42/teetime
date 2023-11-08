@@ -347,8 +347,6 @@ class Command(BaseCommand):
         )
         user_request.course_schedules.set([douglaston_eighteen])
 
-        user_request.course_schedules.set([kissena_eighteen])
-
         user_request = UserTeeTimeRequest.objects.create(
             user=u,
             course=kissena,
