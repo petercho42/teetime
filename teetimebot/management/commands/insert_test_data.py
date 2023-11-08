@@ -337,7 +337,7 @@ class Command(BaseCommand):
         user_request = UserTeeTimeRequest.objects.create(
             user=u,
             course=douglaston,
-            date=date(2023, 11, 8),
+            date=date(2023, 11, 16),
             tee_time_max=time(12, 31),
             group_id="weekday_deals",
             status=UserTeeTimeRequest.Status.ACTIVE,
@@ -347,23 +347,12 @@ class Command(BaseCommand):
         )
         user_request.course_schedules.set([douglaston_eighteen])
 
-        user_request = UserTeeTimeRequest.objects.create(
-            user=u,
-            course=douglaston,
-            date=date(2023, 11, 9),
-            tee_time_max=time(12, 31),
-            group_id="weekday_deals",
-            status=UserTeeTimeRequest.Status.ACTIVE,
-        )
-        self.stdout.write(
-            self.style.SUCCESS(f"Created UserTeeTimeRequest {user_request.id}")
-        )
-        user_request.course_schedules.set([douglaston_eighteen])
+        user_request.course_schedules.set([kissena_eighteen])
 
         user_request = UserTeeTimeRequest.objects.create(
             user=u,
             course=kissena,
-            date=date(2023, 11, 8),
+            date=date(2023, 11, 16),
             tee_time_max=time(12, 31),
             group_id="weekday_deals",
             status=UserTeeTimeRequest.Status.ACTIVE,
@@ -372,27 +361,3 @@ class Command(BaseCommand):
             self.style.SUCCESS(f"Created UserTeeTimeRequest {user_request.id}")
         )
         user_request.course_schedules.set([kissena_eighteen])
-
-        user_request = UserTeeTimeRequest.objects.create(
-            user=u,
-            course=kissena,
-            date=date(2023, 11, 9),
-            tee_time_max=time(12, 31),
-            group_id="weekday_deals",
-            status=UserTeeTimeRequest.Status.ACTIVE,
-        )
-        self.stdout.write(
-            self.style.SUCCESS(f"Created UserTeeTimeRequest {user_request.id}")
-        )
-        user_request.course_schedules.set([kissena_eighteen])
-
-        user_request = UserTeeTimeRequest.objects.create(
-            user=u,
-            course=west_point,
-            date=date(2023, 11, 11),
-            status=UserTeeTimeRequest.Status.ACTIVE,
-        )
-        self.stdout.write(
-            self.style.SUCCESS(f"Created UserTeeTimeRequest {user_request.id}")
-        )
-        user_request.course_schedules.set([west_point_eighteen])
