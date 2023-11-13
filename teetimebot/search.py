@@ -208,6 +208,11 @@ class Search:
                                         and time_obj >= request_obj.tee_time_max
                                     ):
                                         break
+                                    if (
+                                        request_obj.players
+                                        and tee_time["rounds"] < request_obj.players
+                                    ):
+                                        break
                                     MatchingTeeTime.update_or_create_instance(
                                         request_obj, schedule, tee_time
                                     )
