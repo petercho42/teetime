@@ -338,7 +338,7 @@ class Command(BaseCommand):
             user=u,
             course=douglaston,
             date=date(2023, 11, 16),
-            tee_time_max=time(12, 31),
+            players=UserTeeTimeRequest.Players.THREE,
             group_id="weekday_deals",
             status=UserTeeTimeRequest.Status.ACTIVE,
         )
@@ -351,7 +351,7 @@ class Command(BaseCommand):
             user=u,
             course=kissena,
             date=date(2023, 11, 16),
-            tee_time_max=time(12, 31),
+            players=UserTeeTimeRequest.Players.THREE,
             group_id="weekday_deals",
             status=UserTeeTimeRequest.Status.ACTIVE,
         )
