@@ -241,7 +241,7 @@ class Command(BaseCommand):
                 f"Created CourseSchedule {harbor_links_championship_course.name}"
             )
         )
-        """
+
         harbor_links_champcourse_back_9 = CourseSchedule.objects.create(
             course=harbor_links,
             name="Harbor Links ChampCourse Back Nine",
@@ -265,14 +265,15 @@ class Command(BaseCommand):
             )
         )
 
+        """
+        Create UserTeeTimeRequest
+        """
+
         user_request = UserTeeTimeRequest.objects.create(
             user=u,
             course=bethpage,
-            date=date(2023, 10, 6),
-            tee_time_min=time(9, 59),
-            tee_time_max=time(12, 59),
-            search_time_min=time(5, 00),
-            search_time_max=time(23, 00),
+            date=date(2023, 12, 2),
+            tee_time_max=time(11, 29),
             players=UserTeeTimeRequest.Players.FOUR,
             holes=UserTeeTimeRequest.Holes.ANY,
             status=UserTeeTimeRequest.Status.ACTIVE,
@@ -280,7 +281,11 @@ class Command(BaseCommand):
         self.stdout.write(
             self.style.SUCCESS(f"Created UserTeeTimeRequest {user_request.id}")
         )
-        user_request.course_schedules.set([bethpage_yellow])
+        user_request.course_schedules.set([bethpage_yellow, bethpage_blue])
+
+        """
+
+
 
         user_request = UserTeeTimeRequest.objects.create(
             user=u,
@@ -328,12 +333,6 @@ class Command(BaseCommand):
         )
         user_request.course_schedules.set([harbor_links_championship_course])
 
-        """
-
-        """
-        Create UserTeeTimeRequest
-        """
-
         user_request = UserTeeTimeRequest.objects.create(
             user=u,
             course=douglaston,
@@ -359,3 +358,5 @@ class Command(BaseCommand):
             self.style.SUCCESS(f"Created UserTeeTimeRequest {user_request.id}")
         )
         user_request.course_schedules.set([kissena_eighteen])
+
+        """
