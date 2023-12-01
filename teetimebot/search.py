@@ -371,7 +371,7 @@ class Search:
                     else:
                     """
                     # randomly sleep for 1-5 seconds to avoid getting rate limited
-                    time.sleep(random.uniform(1, 10))
+                    time.sleep(random.uniform(1, 5))
 
             else:
                 time.sleep(1)
