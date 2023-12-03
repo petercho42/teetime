@@ -271,6 +271,47 @@ class Command(BaseCommand):
 
         user_request = UserTeeTimeRequest.objects.create(
             user=u,
+            course=douglaston,
+            date=date(2023, 12, 8),
+            players=UserTeeTimeRequest.Players.ANY,
+            group_id="weekday_deals",
+            status=UserTeeTimeRequest.Status.ACTIVE,
+        )
+        self.stdout.write(
+            self.style.SUCCESS(f"Created UserTeeTimeRequest {user_request.id}")
+        )
+        user_request.course_schedules.set([douglaston_eighteen])
+
+        user_request = UserTeeTimeRequest.objects.create(
+            user=u,
+            course=kissena,
+            date=date(2023, 12, 8),
+            players=UserTeeTimeRequest.Players.ANY,
+            group_id="weekday_deals",
+            status=UserTeeTimeRequest.Status.ACTIVE,
+        )
+        self.stdout.write(
+            self.style.SUCCESS(f"Created UserTeeTimeRequest {user_request.id}")
+        )
+        user_request.course_schedules.set([kissena_eighteen])
+
+        user_request = UserTeeTimeRequest.objects.create(
+            user=u,
+            course=forest_park,
+            date=date(2023, 12, 8),
+            players=UserTeeTimeRequest.Players.ANY,
+            group_id="weekday_deals",
+            status=UserTeeTimeRequest.Status.ACTIVE,
+        )
+        self.stdout.write(
+            self.style.SUCCESS(f"Created UserTeeTimeRequest {user_request.id}")
+        )
+        user_request.course_schedules.set([forest_park_eighteen])
+
+        """
+
+        user_request = UserTeeTimeRequest.objects.create(
+            user=u,
             course=bethpage,
             date=date(2023, 12, 2),
             tee_time_max=time(11, 29),
@@ -282,10 +323,6 @@ class Command(BaseCommand):
             self.style.SUCCESS(f"Created UserTeeTimeRequest {user_request.id}")
         )
         user_request.course_schedules.set([bethpage_yellow, bethpage_blue])
-
-        """
-
-
 
         user_request = UserTeeTimeRequest.objects.create(
             user=u,
@@ -332,31 +369,5 @@ class Command(BaseCommand):
             self.style.SUCCESS(f"Created UserTeeTimeRequest {user_request.id}")
         )
         user_request.course_schedules.set([harbor_links_championship_course])
-
-        user_request = UserTeeTimeRequest.objects.create(
-            user=u,
-            course=douglaston,
-            date=date(2023, 11, 16),
-            players=UserTeeTimeRequest.Players.THREE,
-            group_id="weekday_deals",
-            status=UserTeeTimeRequest.Status.ACTIVE,
-        )
-        self.stdout.write(
-            self.style.SUCCESS(f"Created UserTeeTimeRequest {user_request.id}")
-        )
-        user_request.course_schedules.set([douglaston_eighteen])
-
-        user_request = UserTeeTimeRequest.objects.create(
-            user=u,
-            course=kissena,
-            date=date(2023, 11, 16),
-            players=UserTeeTimeRequest.Players.THREE,
-            group_id="weekday_deals",
-            status=UserTeeTimeRequest.Status.ACTIVE,
-        )
-        self.stdout.write(
-            self.style.SUCCESS(f"Created UserTeeTimeRequest {user_request.id}")
-        )
-        user_request.course_schedules.set([kissena_eighteen])
 
         """
