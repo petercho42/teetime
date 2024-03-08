@@ -308,14 +308,13 @@ class Command(BaseCommand):
         )
         user_request.course_schedules.set([forest_park_eighteen])
 
-        """
-
         user_request = UserTeeTimeRequest.objects.create(
             user=u,
             course=bethpage,
-            date=date(2023, 12, 2),
-            tee_time_max=time(11, 29),
-            players=UserTeeTimeRequest.Players.FOUR,
+            date=date(2024, 3, 10),
+            tee_time_min=time(11, 59),
+            tee_time_max=time(14, 1),
+            players=UserTeeTimeRequest.Players.TWO,
             holes=UserTeeTimeRequest.Holes.ANY,
             status=UserTeeTimeRequest.Status.ACTIVE,
         )
@@ -323,6 +322,8 @@ class Command(BaseCommand):
             self.style.SUCCESS(f"Created UserTeeTimeRequest {user_request.id}")
         )
         user_request.course_schedules.set([bethpage_yellow, bethpage_blue])
+
+        """
 
         user_request = UserTeeTimeRequest.objects.create(
             user=u,
