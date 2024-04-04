@@ -314,7 +314,7 @@ class Command(BaseCommand):
             date=date(2024, 4, 6),
             tee_time_max=time(14, 1),
             players=UserTeeTimeRequest.Players.FOUR,
-            holes=UserTeeTimeRequest.Holes.ANY,
+            holes=UserTeeTimeRequest.Holes.EIGHTEEN,
             status=UserTeeTimeRequest.Status.ACTIVE,
         )
         self.stdout.write(
