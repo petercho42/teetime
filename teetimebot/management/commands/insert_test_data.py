@@ -314,6 +314,8 @@ class Command(BaseCommand):
             date=date(2024, 5, 10),
             tee_time_min=time(9, 29),
             tee_time_max=time(11, 31),
+            search_time_min=time(7, 30),
+            search_time_max=time(23, 30),
             players=UserTeeTimeRequest.Players.FOUR,
             holes=UserTeeTimeRequest.Holes.EIGHTEEN,
             status=UserTeeTimeRequest.Status.ACTIVE,
