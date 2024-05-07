@@ -311,9 +311,9 @@ class Command(BaseCommand):
         user_request = UserTeeTimeRequest.objects.create(
             user=u,
             course=bethpage,
-            date=date(2024, 5, 4),
-            tee_time_min=time(9, 59),
-            tee_time_max=time(14, 1),
+            date=date(2024, 5, 10),
+            tee_time_min=time(9, 29),
+            tee_time_max=time(11, 31),
             players=UserTeeTimeRequest.Players.FOUR,
             holes=UserTeeTimeRequest.Holes.EIGHTEEN,
             status=UserTeeTimeRequest.Status.ACTIVE,
@@ -326,7 +326,6 @@ class Command(BaseCommand):
                 bethpage_yellow,
                 bethpage_blue,
                 bethpage_red,
-                bethpage_black,
                 bethpage_green,
             ]
         )
