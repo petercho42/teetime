@@ -328,6 +328,7 @@ class Command(BaseCommand):
                 bethpage_blue,
                 bethpage_red,
                 bethpage_green,
+                bethpage_yellow,
             ]
         )
 
