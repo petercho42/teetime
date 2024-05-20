@@ -311,7 +311,7 @@ class Command(BaseCommand):
         user_request = UserTeeTimeRequest.objects.create(
             user=u,
             course=bethpage,
-            date=date(2024, 5, 19),
+            date=date(2024, 5, 24),
             tee_time_min=time(8, 59),
             tee_time_max=time(12, 1),
             search_time_min=time(7, 30),
