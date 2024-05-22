@@ -312,10 +312,10 @@ class Command(BaseCommand):
             user=u,
             course=bethpage,
             date=date(2024, 5, 26),
-            tee_time_max=time(9, 1),
+            tee_time_max=time(10, 1),
             search_time_min=time(7, 30),
             search_time_max=time(23, 30),
-            players=UserTeeTimeRequest.Players.THREE,
+            players=UserTeeTimeRequest.Players.FOUR,
             holes=UserTeeTimeRequest.Holes.EIGHTEEN,
             status=UserTeeTimeRequest.Status.ACTIVE,
         )
