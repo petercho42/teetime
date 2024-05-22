@@ -312,7 +312,7 @@ class Command(BaseCommand):
             user=u,
             course=bethpage,
             date=date(2024, 5, 26),
-            tee_time_max=time(10, 1),
+            tee_time_max=time(8, 27),
             search_time_min=time(6, 00),
             search_time_max=time(23, 00),
             players=UserTeeTimeRequest.Players.FOUR,
@@ -323,11 +323,7 @@ class Command(BaseCommand):
             self.style.SUCCESS(f"Created UserTeeTimeRequest {user_request.id}")
         )
         user_request.course_schedules.set(
-            [
-                bethpage_blue,
-                bethpage_green,
-                bethpage_yellow,
-            ]
+            [bethpage_blue, bethpage_green, bethpage_yellow, bethpage_red]
         )
 
         """
