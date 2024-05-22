@@ -315,7 +315,7 @@ class Command(BaseCommand):
             tee_time_max=time(9, 1),
             search_time_min=time(7, 30),
             search_time_max=time(23, 30),
-            players=UserTeeTimeRequest.Players.FOUR,
+            players=UserTeeTimeRequest.Players.THREE,
             holes=UserTeeTimeRequest.Holes.EIGHTEEN,
             status=UserTeeTimeRequest.Status.ACTIVE,
         )
