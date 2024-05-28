@@ -322,7 +322,9 @@ class Command(BaseCommand):
         self.stdout.write(
             self.style.SUCCESS(f"Created UserTeeTimeRequest {user_request.id}")
         )
-        user_request.course_schedules.set([bethpage_yellow])
+        user_request.course_schedules.set(
+            [bethpage_yellow, bethpage_blue, bethpage_green]
+        )
 
         """
 
