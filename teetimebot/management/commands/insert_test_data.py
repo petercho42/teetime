@@ -311,10 +311,10 @@ class Command(BaseCommand):
         user_request = UserTeeTimeRequest.objects.create(
             user=u,
             course=bethpage,
-            date=date(2024, 6, 15),
+            date=date(2024, 6, 23),
             tee_time_max=time(12, 00),
-            search_time_min=time(5, 00),
-            search_time_max=time(23, 59),
+            search_time_min=time(6, 00),
+            search_time_max=time(23, 00),
             players=UserTeeTimeRequest.Players.FOUR,
             holes=UserTeeTimeRequest.Holes.EIGHTEEN,
             status=UserTeeTimeRequest.Status.ACTIVE,
