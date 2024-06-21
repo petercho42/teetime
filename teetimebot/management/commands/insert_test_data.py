@@ -312,7 +312,7 @@ class Command(BaseCommand):
             user=u,
             course=bethpage,
             date=date(2024, 6, 22),
-            tee_time_max=time(8, 59),
+            tee_time_min=time(8, 59),
             tee_time_max=time(12, 1),
             search_time_min=time(6, 00),
             search_time_max=time(23, 00),
